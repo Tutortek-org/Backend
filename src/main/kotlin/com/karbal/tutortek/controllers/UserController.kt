@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody
 class UserController(val userService: UserService) {
 
     @GetMapping
-    fun index() = "TEST"
+    fun index() = "TESTAS"
 
     @PostMapping("/users/add")
     fun addUser(@RequestBody user: User){
