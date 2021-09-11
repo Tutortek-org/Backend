@@ -7,7 +7,8 @@ import javax.persistence.*
 data class User(
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_generator")
+    @SequenceGenerator(name = "user_generator", sequenceName = "user_seq", allocationSize = 1)
     var id: Long? = null,
 
     @Column(name = "name", nullable = false)

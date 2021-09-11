@@ -9,17 +9,9 @@ class UserService(val database: UserRepository) {
 
     fun getAllUsers(): List<User> = database.getAllUsers()
 
-    fun createUser(user: User){
-        database.save(user)
-    }
+    fun saveUser(user: User) = database.save(user)
 
-    fun deleteUser(id: Long){
-        database.deleteById(id)
-    }
+    fun deleteUser(id: Long) = database.deleteById(id)
 
     fun getUser(id: Long) = database.findById(id)
-
-    fun updateUser(user: User){
-        database.save(user)
-    }
 }

@@ -14,9 +14,7 @@ class UserController(val userService: UserService) {
     fun index() = "TESTAS"
 
     @PostMapping("/users/add")
-    fun addUser(@RequestBody user: User){
-        userService.createUser(user)
-    }
+    fun addUser(@RequestBody user: User) = userService.saveUser(user)
 
     @DeleteMapping("/users/{id}")
     fun deleteUser(@PathVariable id: Long){
@@ -41,6 +39,6 @@ class UserController(val userService: UserService) {
         if(userInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         val extractedUser = userInDatabase.get()
         extractedUser.copy(user)
-        userService.updateUser(extractedUser)
+        userService.saveUser(extractedUser)
     }
 }
