@@ -8,8 +8,12 @@ data class User(
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: Long? = null,
+    var id: Long? = null,
 
     @Column(name = "name", nullable = false)
-    val name: String
-)
+    var name: String
+){
+    fun copy(user: User){
+        name = user.name
+    }
+}
