@@ -10,9 +10,6 @@ import java.util.*
 @RestController
 class UserController(val userService: UserService) {
 
-    @GetMapping
-    fun index() = "TESTAS"
-
     @PostMapping("/users/add")
     fun addUser(@RequestBody user: User) = userService.saveUser(user)
 
