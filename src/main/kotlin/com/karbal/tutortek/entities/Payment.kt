@@ -1,5 +1,7 @@
 package com.karbal.tutortek.entities
 
+import java.math.BigDecimal
+import java.sql.Date
 import javax.persistence.*
 
 @Entity
@@ -11,10 +13,14 @@ data class Payment(
     @SequenceGenerator(name = "payment_generator", sequenceName = "payment_seq", allocationSize = 1)
     var id: Long? = null,
 
-    @Column(name = "name", nullable = false)
-    var name: String
+    @Column(name = "date", nullable = false)
+    var date: Date,
+
+    @Column(name = "price", nullable = false)
+    var price: BigDecimal
 ) {
     fun copy(payment: Payment){
-        name = payment.name
+        date = payment.date
+        price = payment.price
     }
 }

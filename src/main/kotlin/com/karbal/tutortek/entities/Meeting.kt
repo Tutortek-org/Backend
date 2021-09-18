@@ -1,5 +1,6 @@
 package com.karbal.tutortek.entities
 
+import java.sql.Date
 import javax.persistence.*
 
 @Entity
@@ -12,9 +13,25 @@ data class Meeting(
     var id: Long? = null,
 
     @Column(name = "name", nullable = false)
-    var name: String
+    var name: String,
+
+    @Column(name = "date", nullable = false)
+    var date: Date,
+
+    @Column(name = "maxAttendants", nullable = false)
+    var maxAttendants: Int,
+
+    @Column(name = "address", nullable = false)
+    var address: String,
+
+    @Column(name = "description", nullable = false)
+    var description: String
 ) {
     fun copy(meeting: Meeting){
         name = meeting.name
+        date = meeting.date
+        maxAttendants = meeting.maxAttendants
+        address = meeting.address
+        description = meeting.description
     }
 }
