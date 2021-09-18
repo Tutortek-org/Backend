@@ -1,18 +1,24 @@
 package com.karbal.tutortek.controllers
 
+import com.karbal.tutortek.dto.PaymentDTO
 import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.services.PaymentService
+import com.karbal.tutortek.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-class PaymentController(val paymentService: PaymentService) {
+class PaymentController(val paymentService: PaymentService,
+                        val userService: UserService) {
 
     @PostMapping("/payments/add")
-    fun addPayment(@RequestBody payment: Payment) = paymentService.savePayment(payment)
+    fun addPayment(@RequestBody paymentDTO: PaymentDTO): Payment {
+        val payment = dtoToEntity(paymentDTO)
+        return paymentService.savePayment(payment)
+    }
 
     @DeleteMapping("/payments/{id}")
     fun deletePayment(@PathVariable id: Long){
@@ -38,5 +44,12 @@ class PaymentController(val paymentService: PaymentService) {
         val extractedPayment = paymentInDatabase.get()
         extractedPayment.copy(payment)
         paymentService.savePayment(extractedPayment)
+    }
+
+    fun dtoToEntity(paymentDTO: PaymentDTO): Payment {
+        val payment = Payment()
+        payment.price = paymentDTO.price
+        payment.user = userService.getUser(paymentDTO.userId).get()
+        return payment
     }
 }
