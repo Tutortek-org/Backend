@@ -29,5 +29,6 @@ data class Payment(
     fun copy(payment: Payment){
         date = payment.date
         price = payment.price
+        user = payment.user
     }
 }

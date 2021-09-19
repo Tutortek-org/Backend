@@ -2,7 +2,6 @@ package com.karbal.tutortek.controllers
 
 import com.karbal.tutortek.dto.PaymentDTO
 import com.karbal.tutortek.entities.Payment
-import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.services.PaymentService
 import com.karbal.tutortek.services.UserService
 import org.springframework.http.HttpStatus
@@ -16,7 +15,7 @@ class PaymentController(val paymentService: PaymentService,
 
     @PostMapping("/payments/add")
     fun addPayment(@RequestBody paymentDTO: PaymentDTO): Payment {
-        val payment = dtoToEntity(paymentDTO)
+        val payment = convertDtoToEntity(paymentDTO)
         return paymentService.savePayment(payment)
     }
 
@@ -38,7 +37,8 @@ class PaymentController(val paymentService: PaymentService,
     }
 
     @PutMapping("/payments/{id}")
-    fun updatePayment(@PathVariable id: Long, @RequestBody payment: Payment){
+    fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentDTO){
+        val payment = convertDtoToEntity(paymentDTO)
         val paymentInDatabase = paymentService.getPayment(id)
         if(paymentInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
         val extractedPayment = paymentInDatabase.get()
@@ -46,7 +46,7 @@ class PaymentController(val paymentService: PaymentService,
         paymentService.savePayment(extractedPayment)
     }
 
-    fun dtoToEntity(paymentDTO: PaymentDTO): Payment {
+    fun convertDtoToEntity(paymentDTO: PaymentDTO): Payment {
         val payment = Payment()
         payment.price = paymentDTO.price
         payment.user = userService.getUser(paymentDTO.userId).get()

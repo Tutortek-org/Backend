@@ -13,7 +13,7 @@ class UserController(val userService: UserService) {
 
     @PostMapping("/users/add")
     fun addUser(@RequestBody userDTO: UserDTO): User {
-        val user = dtoToEntity(userDTO)
+        val user = convertDtoToEntity(userDTO)
         return userService.saveUser(user)
     }
 
@@ -35,7 +35,8 @@ class UserController(val userService: UserService) {
     }
 
     @PutMapping("/users/{id}")
-    fun updateUser(@PathVariable id: Long, @RequestBody user: User){
+    fun updateUser(@PathVariable id: Long, @RequestBody userDTO: UserDTO){
+        val user = convertDtoToEntity(userDTO)
         val userInDatabase = userService.getUser(id)
         if(userInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         val extractedUser = userInDatabase.get()
@@ -43,7 +44,7 @@ class UserController(val userService: UserService) {
         userService.saveUser(extractedUser)
     }
 
-    fun dtoToEntity(userDTO: UserDTO): User {
+    fun convertDtoToEntity(userDTO: UserDTO): User {
         val user = User()
         user.firstName = userDTO.firstName
         user.lastName = userDTO.lastName

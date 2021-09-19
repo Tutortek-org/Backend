@@ -1,7 +1,6 @@
 package com.karbal.tutortek.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonManagedReference
 import java.sql.Date
 import javax.persistence.*
 
@@ -35,5 +34,6 @@ data class User(
         lastName = user.lastName
         birthDate = user.birthDate
         rating = user.rating
+        payments = user.payments
     }
 }
