@@ -30,7 +30,11 @@ data class Meeting(
 
     @OneToMany(mappedBy = "meeting")
     @JsonIgnoreProperties("meeting")
-    var payments: List<Payment> = listOf()
+    var payments: List<Payment> = listOf(),
+
+    @OneToMany(mappedBy = "meeting")
+    @JsonIgnoreProperties("meeting")
+    var learningMaterials: List<LearningMaterial> = listOf()
 ) {
     fun copy(meeting: Meeting){
         name = meeting.name
@@ -39,5 +43,6 @@ data class Meeting(
         address = meeting.address
         description = meeting.description
         payments = meeting.payments
+        learningMaterials = meeting.learningMaterials
     }
 }

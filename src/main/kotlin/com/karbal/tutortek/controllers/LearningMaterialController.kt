@@ -1,14 +1,17 @@
 package com.karbal.tutortek.controllers
 
+import com.karbal.tutortek.dto.LearningMaterialDTO
 import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
+import com.karbal.tutortek.services.MeetingService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-class LearningMaterialController(val learningMaterialService: LearningMaterialService) {
+class LearningMaterialController(val learningMaterialService: LearningMaterialService,
+                                 val meetingService: MeetingService) {
 
     @GetMapping("/materials/all")
     fun getAllLearningMaterials() = learningMaterialService.getAllLearningMaterials()
@@ -21,7 +24,10 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
     }
 
     @PostMapping("/materials/add")
-    fun addLearningMaterial(@RequestBody learningMaterial: LearningMaterial) = learningMaterialService.saveLearningMaterial(learningMaterial)
+    fun addLearningMaterial(@RequestBody learningMaterialDTO: LearningMaterialDTO): LearningMaterial {
+        val learningMaterial = convertDtoToEntity(learningMaterialDTO)
+        return learningMaterialService.saveLearningMaterial(learningMaterial)
+    }
 
     @DeleteMapping("/materials/{id}")
     fun deleteLearningMaterial(@PathVariable id: Long) {
@@ -31,11 +37,21 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
     }
 
     @PutMapping("/materials/{id}")
-    fun updateLearningMaterial(@PathVariable id: Long, @RequestBody learningMaterial: LearningMaterial){
+    fun updateLearningMaterial(@PathVariable id: Long, @RequestBody learningMaterialDTO: LearningMaterialDTO) {
+        val learningMaterial = convertDtoToEntity(learningMaterialDTO)
         val learningMaterialInDatabase = learningMaterialService.getLearningMaterial(id)
         if(learningMaterialInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
         val extractedLearningMaterial = learningMaterialInDatabase.get()
         extractedLearningMaterial.copy(learningMaterial)
         learningMaterialService.saveLearningMaterial(extractedLearningMaterial)
+    }
+
+    fun convertDtoToEntity(learningMaterialDTO: LearningMaterialDTO): LearningMaterial {
+        val learningMaterial = LearningMaterial()
+        learningMaterial.name = learningMaterialDTO.name
+        learningMaterial.description = learningMaterialDTO.description
+        learningMaterial.link = learningMaterialDTO.link
+        learningMaterial.meeting = meetingService.getMeeting(learningMaterialDTO.meetingId).get()
+        return learningMaterial
     }
 }
