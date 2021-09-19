@@ -2,6 +2,7 @@ package com.karbal.tutortek.controllers
 
 import com.karbal.tutortek.dto.PaymentDTO
 import com.karbal.tutortek.entities.Payment
+import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
 import com.karbal.tutortek.services.UserService
 import org.springframework.http.HttpStatus
@@ -11,7 +12,8 @@ import java.util.*
 
 @RestController
 class PaymentController(val paymentService: PaymentService,
-                        val userService: UserService) {
+                        val userService: UserService,
+                        val meetingService: MeetingService) {
 
     @PostMapping("/payments/add")
     fun addPayment(@RequestBody paymentDTO: PaymentDTO): Payment {
@@ -50,6 +52,7 @@ class PaymentController(val paymentService: PaymentService,
         val payment = Payment()
         payment.price = paymentDTO.price
         payment.user = userService.getUser(paymentDTO.userId).get()
+        payment.meeting = meetingService.getMeeting(paymentDTO.paymentId).get()
         return payment
     }
 }

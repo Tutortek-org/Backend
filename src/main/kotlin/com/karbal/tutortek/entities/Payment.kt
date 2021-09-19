@@ -24,8 +24,13 @@ data class Payment(
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnoreProperties("payments")
-    var user: User = User()
+    var user: User = User(),
 ) {
+    @ManyToOne
+    @JoinColumn(name = "meeting_id")
+    @JsonIgnoreProperties("payments")
+    var meeting: Meeting = Meeting()
+
     fun copy(payment: Payment){
         date = payment.date
         price = payment.price
