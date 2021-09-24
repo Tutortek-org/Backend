@@ -1,5 +1,7 @@
 package com.karbal.tutortek.entities
 
+import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.math.BigDecimal
 import java.sql.Date
 import javax.persistence.*
@@ -14,13 +16,25 @@ data class Payment(
     var id: Long? = null,
 
     @Column(name = "date", nullable = false)
-    var date: Date,
+    var date: Date = Date(System.currentTimeMillis()),
 
     @Column(name = "price", nullable = false)
-    var price: BigDecimal
+    var price: BigDecimal = BigDecimal(0.0),
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties("payments")
+    var user: User = User(),
+
+    @ManyToOne
+    @JoinColumn(name = "meeting_id")
+    @JsonIgnoreProperties("payments")
+    var meeting: Meeting = Meeting()
 ) {
     fun copy(payment: Payment){
         date = payment.date
         price = payment.price
+        user = payment.user
+        meeting = payment.meeting
     }
 }

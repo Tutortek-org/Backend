@@ -1,5 +1,6 @@
 package com.karbal.tutortek.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.sql.Date
 import javax.persistence.*
 
@@ -13,21 +14,26 @@ data class User(
     var id: Long? = null,
 
     @Column(name = "firstName", nullable = false)
-    var firstName: String,
+    var firstName: String = "",
 
     @Column(name = "lastName", nullable = false)
-    var lastName: String,
+    var lastName: String = "",
 
     @Column(name = "birthDate", nullable = false)
-    var birthDate: Date,
+    var birthDate: Date = Date(System.currentTimeMillis()),
 
     @Column(name = "rating", nullable = false)
-    var rating: Float
+    var rating: Float = 0.0F,
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user")
+    var payments: List<Payment> = listOf()
 ){
     fun copy(user: User){
         firstName = user.firstName
         lastName = user.lastName
         birthDate = user.birthDate
         rating = user.rating
+        payments = user.payments
     }
 }

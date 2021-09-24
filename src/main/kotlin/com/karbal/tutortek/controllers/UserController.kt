@@ -1,5 +1,6 @@
 package com.karbal.tutortek.controllers
 
+import com.karbal.tutortek.dto.UserDTO
 import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.services.UserService
 import org.springframework.http.HttpStatus
@@ -11,7 +12,10 @@ import java.util.*
 class UserController(val userService: UserService) {
 
     @PostMapping("/users/add")
-    fun addUser(@RequestBody user: User) = userService.saveUser(user)
+    fun addUser(@RequestBody userDTO: UserDTO): User {
+        val user = convertDtoToEntity(userDTO)
+        return userService.saveUser(user)
+    }
 
     @DeleteMapping("/users/{id}")
     fun deleteUser(@PathVariable id: Long){
@@ -31,11 +35,20 @@ class UserController(val userService: UserService) {
     }
 
     @PutMapping("/users/{id}")
-    fun updateUser(@PathVariable id: Long, @RequestBody user: User){
+    fun updateUser(@PathVariable id: Long, @RequestBody userDTO: UserDTO){
+        val user = convertDtoToEntity(userDTO)
         val userInDatabase = userService.getUser(id)
         if(userInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         val extractedUser = userInDatabase.get()
         extractedUser.copy(user)
         userService.saveUser(extractedUser)
+    }
+
+    fun convertDtoToEntity(userDTO: UserDTO): User {
+        val user = User()
+        user.firstName = userDTO.firstName
+        user.lastName = userDTO.lastName
+        user.rating = userDTO.rating
+        return user
     }
 }
