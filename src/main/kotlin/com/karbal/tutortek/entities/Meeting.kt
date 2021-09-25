@@ -29,12 +29,17 @@ data class Meeting(
     var description: String = "",
 
     @OneToMany(mappedBy = "meeting")
-    @JsonIgnoreProperties("meeting")
+    @JsonIgnoreProperties("meeting", "user")
     var payments: List<Payment> = listOf(),
 
     @OneToMany(mappedBy = "meeting")
     @JsonIgnoreProperties("meeting")
-    var learningMaterials: List<LearningMaterial> = listOf()
+    var learningMaterials: List<LearningMaterial> = listOf(),
+
+    @ManyToOne
+    @JoinColumn(name = "topic_id")
+    @JsonIgnoreProperties("topics", "user", "meetings")
+    var topic: Topic = Topic()
 ) {
     fun copy(meeting: Meeting){
         name = meeting.name
@@ -44,5 +49,6 @@ data class Meeting(
         description = meeting.description
         payments = meeting.payments
         learningMaterials = meeting.learningMaterials
+        topic = meeting.topic
     }
 }

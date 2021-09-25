@@ -7,5 +7,6 @@ data class MeetingDTO(
     var date: Date,
     var maxAttendants: Int,
     var address: String,
-    var description: String
+    var description: String,
+    var topicId: Long
 )

@@ -3,13 +3,15 @@ package com.karbal.tutortek.controllers
 import com.karbal.tutortek.dto.MeetingDTO
 import com.karbal.tutortek.entities.Meeting
 import com.karbal.tutortek.services.MeetingService
+import com.karbal.tutortek.services.TopicService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-class MeetingController(val meetingService: MeetingService) {
+class MeetingController(val meetingService: MeetingService,
+                        val topicService: TopicService) {
 
     @GetMapping("/meetings/all")
     fun getAllMeetings() = meetingService.getAllMeetings()
@@ -51,6 +53,7 @@ class MeetingController(val meetingService: MeetingService) {
         meeting.description = meetingDTO.description
         meeting.name = meetingDTO.name
         meeting.maxAttendants = meetingDTO.maxAttendants
+        meeting.topic = topicService.getTopic(meetingDTO.topicId).get()
         return meeting
     }
 }
