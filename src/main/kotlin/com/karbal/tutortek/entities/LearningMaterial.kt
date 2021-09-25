@@ -23,7 +23,7 @@ data class LearningMaterial(
 
     @ManyToOne
     @JoinColumn(name = "meeting_id")
-    @JsonIgnoreProperties("learningMaterials")
+    @JsonIgnoreProperties("learningMaterials", "payments")
     var meeting: Meeting = Meeting()
 ) {
     fun copy(learningMaterial: LearningMaterial){

@@ -27,7 +27,11 @@ data class User(
 
     @OneToMany(mappedBy = "user")
     @JsonIgnoreProperties("user")
-    var payments: List<Payment> = listOf()
+    var payments: List<Payment> = listOf(),
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user", "meetings")
+    var topics: List<Topic> = listOf()
 ){
     fun copy(user: User){
         firstName = user.firstName

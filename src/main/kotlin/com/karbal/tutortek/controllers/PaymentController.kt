@@ -52,7 +52,7 @@ class PaymentController(val paymentService: PaymentService,
         val payment = Payment()
         payment.price = paymentDTO.price
         payment.user = userService.getUser(paymentDTO.userId).get()
-        payment.meeting = meetingService.getMeeting(paymentDTO.paymentId).get()
+        payment.meeting = meetingService.getMeeting(paymentDTO.meetingId).get()
         return payment
     }
 }

@@ -23,12 +23,12 @@ data class Payment(
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties("payments")
+    @JsonIgnoreProperties("payments", "topics")
     var user: User = User(),
 
     @ManyToOne
     @JoinColumn(name = "meeting_id")
-    @JsonIgnoreProperties("payments")
+    @JsonIgnoreProperties("payments", "learningMaterials")
     var meeting: Meeting = Meeting()
 ) {
     fun copy(payment: Payment){
