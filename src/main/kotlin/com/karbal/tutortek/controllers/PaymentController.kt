@@ -1,6 +1,6 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.PaymentPostDTO
+import com.karbal.tutortek.dto.paymentDTO.PaymentPostDTO
 import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService

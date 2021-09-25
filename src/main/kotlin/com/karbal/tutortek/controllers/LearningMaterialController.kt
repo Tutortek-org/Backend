@@ -1,6 +1,6 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.LearningMaterialPostDTO
+import com.karbal.tutortek.dto.learningMaterialDTO.LearningMaterialPostDTO
 import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
 import com.karbal.tutortek.services.MeetingService

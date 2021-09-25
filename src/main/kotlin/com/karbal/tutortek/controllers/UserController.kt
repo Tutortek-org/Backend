@@ -1,6 +1,6 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.UserPostDTO
+import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.services.UserService
 import org.springframework.http.HttpStatus

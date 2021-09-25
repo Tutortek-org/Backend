@@ -1,4 +1,4 @@
-package com.karbal.tutortek.dto
+package com.karbal.tutortek.dto.learningMaterialDTO
 
 data class LearningMaterialPostDTO(
     var name: String,

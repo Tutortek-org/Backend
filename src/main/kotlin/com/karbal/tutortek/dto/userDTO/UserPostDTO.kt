@@ -1,4 +1,4 @@
-package com.karbal.tutortek.dto
+package com.karbal.tutortek.dto.userDTO
 
 data class UserPostDTO(
     var firstName: String,

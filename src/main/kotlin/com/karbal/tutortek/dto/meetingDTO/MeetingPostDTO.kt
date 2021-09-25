@@ -1,4 +1,4 @@
-package com.karbal.tutortek.dto
+package com.karbal.tutortek.dto.meetingDTO
 
 import java.sql.Date
 

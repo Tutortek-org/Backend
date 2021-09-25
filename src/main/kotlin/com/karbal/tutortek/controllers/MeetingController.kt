@@ -1,6 +1,6 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.MeetingPostDTO
+import com.karbal.tutortek.dto.meetingDTO.MeetingPostDTO
 import com.karbal.tutortek.entities.Meeting
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.TopicService

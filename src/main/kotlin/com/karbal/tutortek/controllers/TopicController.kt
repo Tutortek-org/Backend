@@ -1,6 +1,6 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.TopicPostDTO
+import com.karbal.tutortek.dto.topicDTO.TopicPostDTO
 import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.services.UserService
