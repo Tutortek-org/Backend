@@ -20,7 +20,7 @@ data class User(
     var lastName: String = "",
 
     @Column(name = "birthDate", nullable = false)
-    var birthDate: Date = Date(System.currentTimeMillis()),
+    var creationDate: Date = Date(System.currentTimeMillis()),
 
     @Column(name = "rating", nullable = false)
     var rating: Float = 0.0F,
@@ -36,7 +36,7 @@ data class User(
     fun copy(user: User){
         firstName = user.firstName
         lastName = user.lastName
-        birthDate = user.birthDate
+        creationDate = user.creationDate
         rating = user.rating
         payments = user.payments
     }
