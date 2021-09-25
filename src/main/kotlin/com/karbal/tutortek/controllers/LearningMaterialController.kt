@@ -15,7 +15,7 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
                                  val meetingService: MeetingService) {
 
     @GetMapping("/materials/all")
-    fun getAllLearningMaterials() = learningMaterialService.getAllLearningMaterials()
+    fun getAllLearningMaterials() = learningMaterialService.getAllLearningMaterials().map { lm -> LearningMaterialGetDTO(lm) }
 
     @GetMapping("/materials/{id}")
     fun getLearningMaterial(@PathVariable id: Long): LearningMaterialGetDTO {

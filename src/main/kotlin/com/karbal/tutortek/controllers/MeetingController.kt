@@ -15,7 +15,7 @@ class MeetingController(val meetingService: MeetingService,
                         val topicService: TopicService) {
 
     @GetMapping("/meetings/all")
-    fun getAllMeetings() = meetingService.getAllMeetings()
+    fun getAllMeetings() = meetingService.getAllMeetings().map { m -> MeetingGetDTO(m) }
 
     @GetMapping("/meetings/{id}")
     fun getMeeting(@PathVariable id: Long): MeetingGetDTO {

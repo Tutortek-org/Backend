@@ -26,7 +26,7 @@ class UserController(val userService: UserService) {
     }
 
     @GetMapping("/users/all")
-    fun getAllUsers() = userService.getAllUsers()
+    fun getAllUsers() = userService.getAllUsers().map { u -> UserGetDTO(u) }
 
     @GetMapping("/users/{id}")
     fun getUser(@PathVariable id: Long): UserGetDTO {

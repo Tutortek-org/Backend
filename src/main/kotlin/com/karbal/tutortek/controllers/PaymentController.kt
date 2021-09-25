@@ -30,7 +30,7 @@ class PaymentController(val paymentService: PaymentService,
     }
 
     @GetMapping("/payments/all")
-    fun getAllPayments() = paymentService.getAllPayments()
+    fun getAllPayments() = paymentService.getAllPayments().map { p -> PaymentGetDTO(p) }
 
     @GetMapping("/payments/{id}")
     fun getPayment(@PathVariable id: Long): PaymentGetDTO {

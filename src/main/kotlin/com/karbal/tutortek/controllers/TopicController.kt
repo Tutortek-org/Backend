@@ -29,7 +29,7 @@ class TopicController(val topicService: TopicService,
     }
 
     @GetMapping("/topics/all")
-    fun getAllTopics() = topicService.getAllTopics()
+    fun getAllTopics() = topicService.getAllTopics().map { t -> TopicGetDTO(t) }
 
     @GetMapping("/topics/{id}")
     fun getTopic(@PathVariable id: Long): TopicGetDTO {
