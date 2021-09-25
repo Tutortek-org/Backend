@@ -1,5 +1,6 @@
 package com.karbal.tutortek.controllers
 
+import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.services.UserService
@@ -28,10 +29,10 @@ class UserController(val userService: UserService) {
     fun getAllUsers() = userService.getAllUsers()
 
     @GetMapping("/users/{id}")
-    fun getUser(@PathVariable id: Long): Optional<User> {
+    fun getUser(@PathVariable id: Long): UserGetDTO {
         val user = userService.getUser(id)
         if(user.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
-        return user
+        return UserGetDTO(user.get())
     }
 
     @PutMapping("/users/{id}")

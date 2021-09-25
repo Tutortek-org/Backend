@@ -1,5 +1,6 @@
 package com.karbal.tutortek.controllers
 
+import com.karbal.tutortek.dto.learningMaterialDTO.LearningMaterialGetDTO
 import com.karbal.tutortek.dto.learningMaterialDTO.LearningMaterialPostDTO
 import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
@@ -17,10 +18,10 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
     fun getAllLearningMaterials() = learningMaterialService.getAllLearningMaterials()
 
     @GetMapping("/materials/{id}")
-    fun getLearningMaterial(@PathVariable id: Long): Optional<LearningMaterial> {
+    fun getLearningMaterial(@PathVariable id: Long): LearningMaterialGetDTO {
         val learningMaterial = learningMaterialService.getLearningMaterial(id)
         if(learningMaterial.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
-        return learningMaterial
+        return LearningMaterialGetDTO(learningMaterial.get())
     }
 
     @PostMapping("/materials/add")

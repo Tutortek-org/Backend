@@ -1,5 +1,6 @@
 package com.karbal.tutortek.controllers
 
+import com.karbal.tutortek.dto.topicDTO.TopicGetDTO
 import com.karbal.tutortek.dto.topicDTO.TopicPostDTO
 import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.services.TopicService
@@ -31,10 +32,10 @@ class TopicController(val topicService: TopicService,
     fun getAllTopics() = topicService.getAllTopics()
 
     @GetMapping("/topics/{id}")
-    fun getTopic(@PathVariable id: Long): Optional<Topic> {
+    fun getTopic(@PathVariable id: Long): TopicGetDTO {
         val topic = topicService.getTopic(id)
         if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
-        return topic
+        return TopicGetDTO(topic.get())
     }
 
     @PutMapping("/topics/{id}")

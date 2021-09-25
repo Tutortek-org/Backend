@@ -1,5 +1,6 @@
 package com.karbal.tutortek.controllers
 
+import com.karbal.tutortek.dto.paymentDTO.PaymentGetDTO
 import com.karbal.tutortek.dto.paymentDTO.PaymentPostDTO
 import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.services.MeetingService
@@ -32,10 +33,10 @@ class PaymentController(val paymentService: PaymentService,
     fun getAllPayments() = paymentService.getAllPayments()
 
     @GetMapping("/payments/{id}")
-    fun getPayment(@PathVariable id: Long): Optional<Payment> {
+    fun getPayment(@PathVariable id: Long): PaymentGetDTO {
         val payment = paymentService.getPayment(id)
         if(payment.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
-        return payment
+        return PaymentGetDTO(payment.get())
     }
 
     @PutMapping("/payments/{id}")

@@ -1,5 +1,6 @@
 package com.karbal.tutortek.controllers
 
+import com.karbal.tutortek.dto.meetingDTO.MeetingGetDTO
 import com.karbal.tutortek.dto.meetingDTO.MeetingPostDTO
 import com.karbal.tutortek.entities.Meeting
 import com.karbal.tutortek.services.MeetingService
@@ -17,10 +18,10 @@ class MeetingController(val meetingService: MeetingService,
     fun getAllMeetings() = meetingService.getAllMeetings()
 
     @GetMapping("/meetings/{id}")
-    fun getMeeting(@PathVariable id: Long): Optional<Meeting> {
+    fun getMeeting(@PathVariable id: Long): MeetingGetDTO {
         val meeting = meetingService.getMeeting(id)
         if(meeting.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
-        return meeting
+        return MeetingGetDTO(meeting.get())
     }
 
     @PostMapping("/meetings/add")
