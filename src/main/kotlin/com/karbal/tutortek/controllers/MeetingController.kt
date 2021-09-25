@@ -57,6 +57,8 @@ class MeetingController(val meetingService: MeetingService,
         val meetingFromDto = convertDtoToEntity(meetingDTO)
         meetingFromDto.id = meetingId
         meetingFromDto.topic = topic.get()
+        meetingFromDto.learningMaterials = meeting.learningMaterials
+        meetingFromDto.payments = meeting.payments
         meetingService.saveMeeting(meetingFromDto)
     }
 

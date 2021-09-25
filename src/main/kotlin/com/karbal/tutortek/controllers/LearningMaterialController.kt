@@ -5,6 +5,7 @@ import com.karbal.tutortek.dto.learningMaterialDTO.LearningMaterialPostDTO
 import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
 import com.karbal.tutortek.services.MeetingService
+import com.karbal.tutortek.services.TopicService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -12,39 +13,68 @@ import java.util.*
 
 @RestController
 class LearningMaterialController(val learningMaterialService: LearningMaterialService,
-                                 val meetingService: MeetingService) {
+                                 val meetingService: MeetingService,
+                                 val topicService: TopicService) {
 
-    @GetMapping("/materials/all")
-    fun getAllLearningMaterials() = learningMaterialService.getAllLearningMaterials().map { lm -> LearningMaterialGetDTO(lm) }
-
-    @GetMapping("/materials/{id}")
-    fun getLearningMaterial(@PathVariable id: Long): LearningMaterialGetDTO {
-        val learningMaterial = learningMaterialService.getLearningMaterial(id)
-        if(learningMaterial.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
-        return LearningMaterialGetDTO(learningMaterial.get())
+    @GetMapping("/topics/{topicId}/meetings/{meetingId}/materials")
+    fun getAllLearningMaterials(@PathVariable topicId: Long, @PathVariable meetingId: Long): List<LearningMaterialGetDTO> {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
+        return meeting.learningMaterials.map { lm -> LearningMaterialGetDTO(lm) }
     }
 
-    @PostMapping("/materials/add")
-    fun addLearningMaterial(@RequestBody learningMaterialDTO: LearningMaterialPostDTO): LearningMaterial {
+    @GetMapping("/topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
+    fun getLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long): LearningMaterialGetDTO {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
+        val learningMaterial = meeting.learningMaterials.find { lm -> lm.id == materialId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
+        return LearningMaterialGetDTO(learningMaterial)
+    }
+
+    @PostMapping("/topics/{topicId}/meetings/{meetingId}/materials")
+    fun addLearningMaterial(@PathVariable topicId: Long,
+                            @PathVariable meetingId: Long,
+                            @RequestBody learningMaterialDTO: LearningMaterialPostDTO): LearningMaterialGetDTO {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
         val learningMaterial = convertDtoToEntity(learningMaterialDTO)
-        return learningMaterialService.saveLearningMaterial(learningMaterial)
+        learningMaterial.meeting = meeting
+        return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(learningMaterial))
     }
 
-    @DeleteMapping("/materials/{id}")
-    fun deleteLearningMaterial(@PathVariable id: Long) {
-        val learningMaterial = learningMaterialService.getLearningMaterial(id)
-        if(learningMaterial.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
-        learningMaterialService.deleteLearningMaterial(id)
+    @DeleteMapping("/topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
+    fun deleteLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long) {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
+        val learningMaterial = meeting.learningMaterials.find { lm -> lm.id == materialId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
+        learningMaterial.id?.let { learningMaterialService.deleteLearningMaterial(it) }
     }
 
-    @PutMapping("/materials/{id}")
-    fun updateLearningMaterial(@PathVariable id: Long, @RequestBody learningMaterialDTO: LearningMaterialPostDTO) {
-        val learningMaterial = convertDtoToEntity(learningMaterialDTO)
-        val learningMaterialInDatabase = learningMaterialService.getLearningMaterial(id)
-        if(learningMaterialInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
-        val extractedLearningMaterial = learningMaterialInDatabase.get()
-        extractedLearningMaterial.copy(learningMaterial)
-        learningMaterialService.saveLearningMaterial(extractedLearningMaterial)
+    @PutMapping("/topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
+    fun updateLearningMaterial(@PathVariable topicId: Long,
+                               @PathVariable meetingId: Long,
+                               @PathVariable materialId: Long,
+                               @RequestBody learningMaterialDTO: LearningMaterialPostDTO) {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
+        val learningMaterial = meeting.learningMaterials.find { lm -> lm.id == materialId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
+        val learningMaterialFromDto = convertDtoToEntity(learningMaterialDTO)
+        learningMaterialFromDto.id = materialId
+        learningMaterialFromDto.meeting = meeting
+        learningMaterialService.saveLearningMaterial(learningMaterialFromDto)
     }
 
     fun convertDtoToEntity(learningMaterialDTO: LearningMaterialPostDTO): LearningMaterial {
@@ -52,7 +82,6 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
         learningMaterial.name = learningMaterialDTO.name
         learningMaterial.description = learningMaterialDTO.description
         learningMaterial.link = learningMaterialDTO.link
-        learningMaterial.meeting = meetingService.getMeeting(learningMaterialDTO.meetingId).get()
         return learningMaterial
     }
 }
