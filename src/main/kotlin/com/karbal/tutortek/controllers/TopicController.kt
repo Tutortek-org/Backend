@@ -1,6 +1,6 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.TopicDTO
+import com.karbal.tutortek.dto.TopicPostDTO
 import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.services.UserService
@@ -15,7 +15,7 @@ class TopicController(val topicService: TopicService,
                       val userService: UserService) {
 
     @PostMapping("/topics/add")
-    fun addTopic(@RequestBody topicDTO: TopicDTO): Topic {
+    fun addTopic(@RequestBody topicDTO: TopicPostDTO): Topic {
         val topic = convertDtoToEntity(topicDTO)
         return topicService.saveTopic(topic)
     }
@@ -38,7 +38,7 @@ class TopicController(val topicService: TopicService,
     }
 
     @PutMapping("/topics/{id}")
-    fun updateTopic(@PathVariable id: Long, @RequestBody topicDTO: TopicDTO){
+    fun updateTopic(@PathVariable id: Long, @RequestBody topicDTO: TopicPostDTO){
         val topic = convertDtoToEntity(topicDTO)
         val topicInDatabase = topicService.getTopic(id)
         if(topicInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
@@ -47,7 +47,7 @@ class TopicController(val topicService: TopicService,
         topicService.saveTopic(extractedTopic)
     }
 
-    fun convertDtoToEntity(topicDTO: TopicDTO): Topic {
+    fun convertDtoToEntity(topicDTO: TopicPostDTO): Topic {
         val topic = Topic()
         topic.name = topicDTO.name
         topic.user = userService.getUser(topicDTO.userId).get()

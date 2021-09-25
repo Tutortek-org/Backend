@@ -1,6 +1,6 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.MeetingDTO
+import com.karbal.tutortek.dto.MeetingPostDTO
 import com.karbal.tutortek.entities.Meeting
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.TopicService
@@ -24,7 +24,7 @@ class MeetingController(val meetingService: MeetingService,
     }
 
     @PostMapping("/meetings/add")
-    fun addMeeting(@RequestBody meetingDTO: MeetingDTO): Meeting {
+    fun addMeeting(@RequestBody meetingDTO: MeetingPostDTO): Meeting {
         val meeting = convertDtoToEntity(meetingDTO)
         return meetingService.saveMeeting(meeting)
     }
@@ -37,7 +37,7 @@ class MeetingController(val meetingService: MeetingService,
     }
 
     @PutMapping("/meetings/{id}")
-    fun updateMeeting(@PathVariable id: Long, @RequestBody meetingDTO: MeetingDTO){
+    fun updateMeeting(@PathVariable id: Long, @RequestBody meetingDTO: MeetingPostDTO){
         val meeting = convertDtoToEntity(meetingDTO)
         val meetingInDatabase = meetingService.getMeeting(id)
         if(meetingInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
@@ -46,7 +46,7 @@ class MeetingController(val meetingService: MeetingService,
         meetingService.saveMeeting(extractedMeeting)
     }
 
-    fun convertDtoToEntity(meetingDTO: MeetingDTO): Meeting {
+    fun convertDtoToEntity(meetingDTO: MeetingPostDTO): Meeting {
         val meeting = Meeting()
         meeting.date = meetingDTO.date
         meeting.address = meetingDTO.address

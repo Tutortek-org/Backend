@@ -1,6 +1,6 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.LearningMaterialDTO
+import com.karbal.tutortek.dto.LearningMaterialPostDTO
 import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
 import com.karbal.tutortek.services.MeetingService
@@ -24,7 +24,7 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
     }
 
     @PostMapping("/materials/add")
-    fun addLearningMaterial(@RequestBody learningMaterialDTO: LearningMaterialDTO): LearningMaterial {
+    fun addLearningMaterial(@RequestBody learningMaterialDTO: LearningMaterialPostDTO): LearningMaterial {
         val learningMaterial = convertDtoToEntity(learningMaterialDTO)
         return learningMaterialService.saveLearningMaterial(learningMaterial)
     }
@@ -37,7 +37,7 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
     }
 
     @PutMapping("/materials/{id}")
-    fun updateLearningMaterial(@PathVariable id: Long, @RequestBody learningMaterialDTO: LearningMaterialDTO) {
+    fun updateLearningMaterial(@PathVariable id: Long, @RequestBody learningMaterialDTO: LearningMaterialPostDTO) {
         val learningMaterial = convertDtoToEntity(learningMaterialDTO)
         val learningMaterialInDatabase = learningMaterialService.getLearningMaterial(id)
         if(learningMaterialInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
@@ -46,7 +46,7 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
         learningMaterialService.saveLearningMaterial(extractedLearningMaterial)
     }
 
-    fun convertDtoToEntity(learningMaterialDTO: LearningMaterialDTO): LearningMaterial {
+    fun convertDtoToEntity(learningMaterialDTO: LearningMaterialPostDTO): LearningMaterial {
         val learningMaterial = LearningMaterial()
         learningMaterial.name = learningMaterialDTO.name
         learningMaterial.description = learningMaterialDTO.description

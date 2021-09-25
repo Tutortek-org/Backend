@@ -2,7 +2,7 @@ package com.karbal.tutortek.dto
 
 import java.sql.Date
 
-data class MeetingDTO(
+data class MeetingPostDTO(
     var name: String,
     var date: Date,
     var maxAttendants: Int,

@@ -1,6 +1,6 @@
 package com.karbal.tutortek.dto
 
-data class TopicDTO(
+data class TopicPostDTO(
     var name: String,
     var userId: Long
 )
