@@ -1,7 +1,5 @@
 package com.karbal.tutortek.entities
 
-import com.fasterxml.jackson.annotation.JsonBackReference
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.math.BigDecimal
 import java.sql.Date
 import javax.persistence.*
@@ -23,12 +21,10 @@ data class Payment(
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties("payments", "topics")
     var user: User = User(),
 
     @ManyToOne
     @JoinColumn(name = "meeting_id")
-    @JsonIgnoreProperties("payments", "learningMaterials")
     var meeting: Meeting = Meeting()
 ) {
     fun copy(payment: Payment){

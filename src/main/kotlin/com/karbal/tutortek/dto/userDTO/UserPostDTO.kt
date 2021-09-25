@@ -1,6 +1,6 @@
-package com.karbal.tutortek.dto
+package com.karbal.tutortek.dto.userDTO
 
-data class UserDTO(
+data class UserPostDTO(
     var firstName: String,
     var lastName: String,
     var rating: Float

@@ -1,6 +1,5 @@
 package com.karbal.tutortek.entities
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import javax.persistence.*
 
 @Entity
@@ -23,7 +22,6 @@ data class LearningMaterial(
 
     @ManyToOne
     @JoinColumn(name = "meeting_id")
-    @JsonIgnoreProperties("learningMaterials", "payments")
     var meeting: Meeting = Meeting()
 ) {
     fun copy(learningMaterial: LearningMaterial){

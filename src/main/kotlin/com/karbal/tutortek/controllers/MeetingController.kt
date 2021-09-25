@@ -1,6 +1,7 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.MeetingDTO
+import com.karbal.tutortek.dto.meetingDTO.MeetingGetDTO
+import com.karbal.tutortek.dto.meetingDTO.MeetingPostDTO
 import com.karbal.tutortek.entities.Meeting
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.TopicService
@@ -13,47 +14,61 @@ import java.util.*
 class MeetingController(val meetingService: MeetingService,
                         val topicService: TopicService) {
 
-    @GetMapping("/meetings/all")
-    fun getAllMeetings() = meetingService.getAllMeetings()
-
-    @GetMapping("/meetings/{id}")
-    fun getMeeting(@PathVariable id: Long): Optional<Meeting> {
-        val meeting = meetingService.getMeeting(id)
-        if(meeting.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
-        return meeting
+    @GetMapping("/topics/{topicId}/meetings")
+    fun getAllMeetings(@PathVariable topicId: Long): List<MeetingGetDTO> {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        return topic.get().meetings.map { m -> MeetingGetDTO(m) }
     }
 
-    @PostMapping("/meetings/add")
-    fun addMeeting(@RequestBody meetingDTO: MeetingDTO): Meeting {
+    @GetMapping("/topics/{topicId}/meetings/{meetingId}")
+    fun getMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long): MeetingGetDTO {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
+        return MeetingGetDTO(meeting)
+    }
+
+    @PostMapping("/topics/{topicId}/meetings")
+    fun addMeeting(@PathVariable topicId: Long, @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
         val meeting = convertDtoToEntity(meetingDTO)
-        return meetingService.saveMeeting(meeting)
+        meeting.topic = topic.get()
+        return MeetingGetDTO(meetingService.saveMeeting(meeting))
     }
 
-    @DeleteMapping("/meetings/{id}")
-    fun deleteMeeting(@PathVariable id: Long) {
-        val meeting = meetingService.getMeeting(id)
-        if(meeting.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
-        meetingService.deleteMeeting(id)
+    @DeleteMapping("/topics/{topicId}/meetings/{meetingId}")
+    fun deleteMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long) {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
+        meeting.id?.let { meetingService.deleteMeeting(it) }
     }
 
-    @PutMapping("/meetings/{id}")
-    fun updateMeeting(@PathVariable id: Long, @RequestBody meetingDTO: MeetingDTO){
-        val meeting = convertDtoToEntity(meetingDTO)
-        val meetingInDatabase = meetingService.getMeeting(id)
-        if(meetingInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
-        val extractedMeeting = meetingInDatabase.get()
-        extractedMeeting.copy(meeting)
-        meetingService.saveMeeting(extractedMeeting)
+    @PutMapping("/topics/{topicId}/meetings/{meetingId}")
+    fun updateMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long, @RequestBody meetingDTO: MeetingPostDTO) {
+        val topic = topicService.getTopic(topicId)
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
+        val meetingFromDto = convertDtoToEntity(meetingDTO)
+        meetingFromDto.id = meetingId
+        meetingFromDto.topic = topic.get()
+        meetingFromDto.learningMaterials = meeting.learningMaterials
+        meetingFromDto.payments = meeting.payments
+        meetingService.saveMeeting(meetingFromDto)
     }
 
-    fun convertDtoToEntity(meetingDTO: MeetingDTO): Meeting {
+    fun convertDtoToEntity(meetingDTO: MeetingPostDTO): Meeting {
         val meeting = Meeting()
         meeting.date = meetingDTO.date
         meeting.address = meetingDTO.address
         meeting.description = meetingDTO.description
         meeting.name = meetingDTO.name
         meeting.maxAttendants = meetingDTO.maxAttendants
-        meeting.topic = topicService.getTopic(meetingDTO.topicId).get()
         return meeting
     }
 }

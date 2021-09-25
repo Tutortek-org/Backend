@@ -1,6 +1,5 @@
 package com.karbal.tutortek.entities
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.sql.Date
 import javax.persistence.*
 
@@ -29,16 +28,13 @@ data class Meeting(
     var description: String = "",
 
     @OneToMany(mappedBy = "meeting")
-    @JsonIgnoreProperties("meeting", "user")
     var payments: List<Payment> = listOf(),
 
     @OneToMany(mappedBy = "meeting")
-    @JsonIgnoreProperties("meeting")
     var learningMaterials: List<LearningMaterial> = listOf(),
 
     @ManyToOne
     @JoinColumn(name = "topic_id")
-    @JsonIgnoreProperties("topics", "user", "meetings")
     var topic: Topic = Topic()
 ) {
     fun copy(meeting: Meeting){

@@ -1,6 +1,7 @@
 package com.karbal.tutortek.controllers
 
-import com.karbal.tutortek.dto.PaymentDTO
+import com.karbal.tutortek.dto.paymentDTO.PaymentGetDTO
+import com.karbal.tutortek.dto.paymentDTO.PaymentPostDTO
 import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
@@ -16,7 +17,7 @@ class PaymentController(val paymentService: PaymentService,
                         val meetingService: MeetingService) {
 
     @PostMapping("/payments/add")
-    fun addPayment(@RequestBody paymentDTO: PaymentDTO): Payment {
+    fun addPayment(@RequestBody paymentDTO: PaymentPostDTO): Payment {
         val payment = convertDtoToEntity(paymentDTO)
         return paymentService.savePayment(payment)
     }
@@ -29,17 +30,17 @@ class PaymentController(val paymentService: PaymentService,
     }
 
     @GetMapping("/payments/all")
-    fun getAllPayments() = paymentService.getAllPayments()
+    fun getAllPayments() = paymentService.getAllPayments().map { p -> PaymentGetDTO(p) }
 
     @GetMapping("/payments/{id}")
-    fun getPayment(@PathVariable id: Long): Optional<Payment> {
+    fun getPayment(@PathVariable id: Long): PaymentGetDTO {
         val payment = paymentService.getPayment(id)
         if(payment.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
-        return payment
+        return PaymentGetDTO(payment.get())
     }
 
     @PutMapping("/payments/{id}")
-    fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentDTO){
+    fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO){
         val payment = convertDtoToEntity(paymentDTO)
         val paymentInDatabase = paymentService.getPayment(id)
         if(paymentInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
@@ -48,7 +49,7 @@ class PaymentController(val paymentService: PaymentService,
         paymentService.savePayment(extractedPayment)
     }
 
-    fun convertDtoToEntity(paymentDTO: PaymentDTO): Payment {
+    fun convertDtoToEntity(paymentDTO: PaymentPostDTO): Payment {
         val payment = Payment()
         payment.price = paymentDTO.price
         payment.user = userService.getUser(paymentDTO.userId).get()
