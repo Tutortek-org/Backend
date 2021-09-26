@@ -12,9 +12,10 @@ import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-class LearningMaterialController(val learningMaterialService: LearningMaterialService,
-                                 val meetingService: MeetingService,
-                                 val topicService: TopicService) {
+class LearningMaterialController(
+    val learningMaterialService: LearningMaterialService,
+    val topicService: TopicService
+) {
 
     @GetMapping("/topics/{topicId}/meetings/{meetingId}/materials")
     fun getAllLearningMaterials(@PathVariable topicId: Long, @PathVariable meetingId: Long): List<LearningMaterialGetDTO> {
@@ -44,7 +45,7 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
         if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
         val meeting = topic.get().meetings.find { m -> m.id == meetingId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
-        val learningMaterial = convertDtoToEntity(learningMaterialDTO)
+        val learningMaterial = LearningMaterial(learningMaterialDTO)
         learningMaterial.meeting = meeting
         return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(learningMaterial))
     }
@@ -71,17 +72,9 @@ class LearningMaterialController(val learningMaterialService: LearningMaterialSe
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
         val learningMaterial = meeting.learningMaterials.find { lm -> lm.id == materialId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Learning material not found")
-        val learningMaterialFromDto = convertDtoToEntity(learningMaterialDTO)
+        val learningMaterialFromDto = LearningMaterial(learningMaterialDTO)
         learningMaterialFromDto.id = materialId
         learningMaterialFromDto.meeting = meeting
         learningMaterialService.saveLearningMaterial(learningMaterialFromDto)
-    }
-
-    fun convertDtoToEntity(learningMaterialDTO: LearningMaterialPostDTO): LearningMaterial {
-        val learningMaterial = LearningMaterial()
-        learningMaterial.name = learningMaterialDTO.name
-        learningMaterial.description = learningMaterialDTO.description
-        learningMaterial.link = learningMaterialDTO.link
-        return learningMaterial
     }
 }
