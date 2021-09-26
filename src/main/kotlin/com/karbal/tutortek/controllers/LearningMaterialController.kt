@@ -38,6 +38,7 @@ class LearningMaterialController(
     }
 
     @PostMapping("/topics/{topicId}/meetings/{meetingId}/materials")
+    @ResponseStatus(HttpStatus.CREATED)
     fun addLearningMaterial(@PathVariable topicId: Long,
                             @PathVariable meetingId: Long,
                             @RequestBody learningMaterialDTO: LearningMaterialPostDTO): LearningMaterialGetDTO {

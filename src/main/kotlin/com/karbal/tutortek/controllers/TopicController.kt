@@ -15,6 +15,7 @@ class TopicController(val topicService: TopicService,
                       val userService: UserService) {
 
     @PostMapping("/topics")
+    @ResponseStatus(HttpStatus.CREATED)
     fun addTopic(@RequestBody topicDTO: TopicPostDTO): TopicGetDTO {
         val topic = convertDtoToEntity(topicDTO)
         return TopicGetDTO(topicService.saveTopic(topic))

@@ -17,6 +17,7 @@ class PaymentController(val paymentService: PaymentService,
                         val meetingService: MeetingService) {
 
     @PostMapping("/payments")
+    @ResponseStatus(HttpStatus.CREATED)
     fun addPayment(@RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
         val payment = convertDtoToEntity(paymentDTO)
         return PaymentGetDTO(paymentService.savePayment(payment))

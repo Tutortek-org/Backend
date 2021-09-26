@@ -13,6 +13,7 @@ import java.util.*
 class UserController(val userService: UserService) {
 
     @PostMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
     fun addUser(@RequestBody userDTO: UserPostDTO): UserGetDTO {
         val user = User(userDTO)
         return UserGetDTO(userService.saveUser(user))

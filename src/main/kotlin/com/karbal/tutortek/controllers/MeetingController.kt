@@ -31,6 +31,7 @@ class MeetingController(val meetingService: MeetingService,
     }
 
     @PostMapping("/topics/{topicId}/meetings")
+    @ResponseStatus(HttpStatus.CREATED)
     fun addMeeting(@PathVariable topicId: Long, @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
