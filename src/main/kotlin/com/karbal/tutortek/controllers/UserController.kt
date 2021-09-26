@@ -12,7 +12,7 @@ import java.util.*
 @RestController
 class UserController(val userService: UserService) {
 
-    @PostMapping("/users/add")
+    @PostMapping("/users")
     fun addUser(@RequestBody userDTO: UserPostDTO): UserGetDTO {
         val user = User(userDTO)
         return UserGetDTO(userService.saveUser(user))
@@ -25,7 +25,7 @@ class UserController(val userService: UserService) {
         userService.deleteUser(id)
     }
 
-    @GetMapping("/users/all")
+    @GetMapping("/users")
     fun getAllUsers() = userService.getAllUsers().map { u -> UserGetDTO(u) }
 
     @GetMapping("/users/{id}")

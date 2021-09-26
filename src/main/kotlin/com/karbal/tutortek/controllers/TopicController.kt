@@ -10,15 +10,14 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
-
 @RestController
 class TopicController(val topicService: TopicService,
                       val userService: UserService) {
 
-    @PostMapping("/topics/add")
-    fun addTopic(@RequestBody topicDTO: TopicPostDTO): Topic {
+    @PostMapping("/topics")
+    fun addTopic(@RequestBody topicDTO: TopicPostDTO): TopicGetDTO {
         val topic = convertDtoToEntity(topicDTO)
-        return topicService.saveTopic(topic)
+        return TopicGetDTO(topicService.saveTopic(topic))
     }
 
     @DeleteMapping("/topics/{id}")
@@ -28,7 +27,7 @@ class TopicController(val topicService: TopicService,
         topicService.deleteTopic(id)
     }
 
-    @GetMapping("/topics/all")
+    @GetMapping("/topics")
     fun getAllTopics() = topicService.getAllTopics().map { t -> TopicGetDTO(t) }
 
     @GetMapping("/topics/{id}")
