@@ -1,7 +1,7 @@
 package com.karbal.tutortek.utils
 
 class ApiErrorSlug {
-    companion object{
+    companion object {
 
         // ID Verification errors
         const val USER_NOT_FOUND = "User not found"
@@ -18,14 +18,17 @@ class ApiErrorSlug {
 
         // Meeting DTO validation errors
         const val ADDRESS_EMPTY = "Address field is empty"
-        const val DESCRIPTION_EMPTY = "Description field is empty"
         const val TOO_FEW_MAX_ATTENDANTS = "There must be at least 1 attendant allowed"
         const val DATE_BEFORE_TODAY = "Meeting date must be after today"
 
         // Payment DTO validation errors
         const val NEGATIVE_PRICE = "Price cannot be negative"
 
+        // Learning material DTO validation errors
+        const val LINK_EMPTY = "Link field is empty"
+
         // Common DTO validation errors
         const val NAME_EMPTY = "Name field is empty"
+        const val DESCRIPTION_EMPTY = "Description field is empty"
     }
 }
