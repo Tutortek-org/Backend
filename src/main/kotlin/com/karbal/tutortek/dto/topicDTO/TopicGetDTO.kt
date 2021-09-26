@@ -3,9 +3,11 @@ package com.karbal.tutortek.dto.topicDTO
 import com.karbal.tutortek.entities.Topic
 
 data class TopicGetDTO(
-    var name: String
+    val id: Long?,
+    val name: String
 ){
     constructor(topic: Topic) : this(
+        topic.id,
         topic.name
     )
 }

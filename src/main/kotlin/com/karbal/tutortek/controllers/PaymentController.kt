@@ -16,7 +16,7 @@ class PaymentController(val paymentService: PaymentService,
                         val userService: UserService,
                         val meetingService: MeetingService) {
 
-    @PostMapping("/payments/add")
+    @PostMapping("/payments")
     fun addPayment(@RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
         val payment = convertDtoToEntity(paymentDTO)
         return PaymentGetDTO(paymentService.savePayment(payment))
@@ -29,7 +29,7 @@ class PaymentController(val paymentService: PaymentService,
         paymentService.deletePayment(id)
     }
 
-    @GetMapping("/payments/all")
+    @GetMapping("/payments")
     fun getAllPayments() = paymentService.getAllPayments().map { p -> PaymentGetDTO(p) }
 
     @GetMapping("/payments/{id}")

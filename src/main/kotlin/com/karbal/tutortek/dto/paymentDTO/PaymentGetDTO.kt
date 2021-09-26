@@ -5,10 +5,12 @@ import java.math.BigDecimal
 import java.sql.Date
 
 data class PaymentGetDTO(
-    var price: BigDecimal,
-    var date: Date
+    val id: Long?,
+    val price: BigDecimal,
+    val date: Date
 ){
     constructor(payment: Payment) : this(
+        payment.id,
         payment.price,
         payment.date
     )
