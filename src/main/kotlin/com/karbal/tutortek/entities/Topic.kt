@@ -15,7 +15,7 @@ data class Topic(
     var name: String = "",
 
     @OneToMany(mappedBy = "topic")
-    var meetings: List<Meeting> = listOf(),
+    var meetings: MutableList<Meeting> = mutableListOf(),
 
     @ManyToOne
     @JoinColumn(name = "user_id")

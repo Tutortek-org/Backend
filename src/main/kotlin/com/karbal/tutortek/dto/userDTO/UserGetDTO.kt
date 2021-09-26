@@ -7,12 +7,12 @@ data class UserGetDTO(
     var firstName: String,
     var lastName: String,
     var rating: Float,
-    var creationDate: Date
+    var birthDate: Date
 ){
     constructor(user: User) : this(
         user.firstName,
         user.lastName,
         user.rating,
-        user.creationDate
+        user.birthDate
     )
 }

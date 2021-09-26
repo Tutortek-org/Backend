@@ -29,10 +29,10 @@ data class Meeting(
     var description: String = "",
 
     @OneToMany(mappedBy = "meeting")
-    var payments: List<Payment> = listOf(),
+    var payments: MutableList<Payment> = mutableListOf(),
 
     @OneToMany(mappedBy = "meeting")
-    var learningMaterials: List<LearningMaterial> = listOf(),
+    var learningMaterials: MutableList<LearningMaterial> = mutableListOf(),
 
     @ManyToOne
     @JoinColumn(name = "topic_id")

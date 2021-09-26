@@ -13,9 +13,9 @@ import java.util.*
 class UserController(val userService: UserService) {
 
     @PostMapping("/users/add")
-    fun addUser(@RequestBody userDTO: UserPostDTO): User {
-        val user = convertDtoToEntity(userDTO)
-        return userService.saveUser(user)
+    fun addUser(@RequestBody userDTO: UserPostDTO): UserGetDTO {
+        val user = User(userDTO)
+        return UserGetDTO(userService.saveUser(user))
     }
 
     @DeleteMapping("/users/{id}")
@@ -37,19 +37,11 @@ class UserController(val userService: UserService) {
 
     @PutMapping("/users/{id}")
     fun updateUser(@PathVariable id: Long, @RequestBody userDTO: UserPostDTO){
-        val user = convertDtoToEntity(userDTO)
+        val user = User(userDTO)
         val userInDatabase = userService.getUser(id)
         if(userInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         val extractedUser = userInDatabase.get()
         extractedUser.copy(user)
         userService.saveUser(extractedUser)
-    }
-
-    fun convertDtoToEntity(userDTO: UserPostDTO): User {
-        val user = User()
-        user.firstName = userDTO.firstName
-        user.lastName = userDTO.lastName
-        user.rating = userDTO.rating
-        return user
     }
 }
