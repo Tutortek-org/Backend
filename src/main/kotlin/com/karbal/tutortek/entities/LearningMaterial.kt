@@ -1,5 +1,6 @@
 package com.karbal.tutortek.entities
 
+import com.karbal.tutortek.dto.learningMaterialDTO.LearningMaterialPostDTO
 import javax.persistence.*
 
 @Entity
@@ -24,10 +25,10 @@ data class LearningMaterial(
     @JoinColumn(name = "meeting_id")
     var meeting: Meeting = Meeting()
 ) {
-    fun copy(learningMaterial: LearningMaterial){
-        name = learningMaterial.name
-        description = learningMaterial.description
-        link = learningMaterial.link
-        meeting = learningMaterial.meeting
-    }
+    constructor(learningMaterialPostDTO: LearningMaterialPostDTO) : this(
+        null,
+        learningMaterialPostDTO.name,
+        learningMaterialPostDTO.description,
+        learningMaterialPostDTO.link
+    )
 }

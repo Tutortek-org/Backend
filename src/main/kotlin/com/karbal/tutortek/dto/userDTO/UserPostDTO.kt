@@ -1,7 +1,10 @@
 package com.karbal.tutortek.dto.userDTO
 
+import java.sql.Date
+
 data class UserPostDTO(
-    var firstName: String,
-    var lastName: String,
-    var rating: Float
+    val firstName: String,
+    val lastName: String,
+    val rating: Float,
+    val birthDate: Date
 )

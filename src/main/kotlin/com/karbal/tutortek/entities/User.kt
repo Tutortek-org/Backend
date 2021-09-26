@@ -1,5 +1,6 @@
 package com.karbal.tutortek.entities
 
+import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import java.sql.Date
 import javax.persistence.*
 
@@ -19,22 +20,31 @@ data class User(
     var lastName: String = "",
 
     @Column(name = "birthDate", nullable = false)
-    var creationDate: Date = Date(System.currentTimeMillis()),
+    var birthDate: Date = Date(System.currentTimeMillis()),
 
     @Column(name = "rating", nullable = false)
     var rating: Float = 0.0F,
 
     @OneToMany(mappedBy = "user")
-    var payments: List<Payment> = listOf(),
+    var payments: MutableList<Payment> = mutableListOf(),
 
     @OneToMany(mappedBy = "user")
-    var topics: List<Topic> = listOf()
+    var topics: MutableList<Topic> = mutableListOf()
 ){
+    constructor(userPostDTO: UserPostDTO) : this(
+        null,
+        userPostDTO.firstName,
+        userPostDTO.lastName,
+        userPostDTO.birthDate,
+        userPostDTO.rating
+    )
+
     fun copy(user: User){
         firstName = user.firstName
         lastName = user.lastName
-        creationDate = user.creationDate
+        birthDate = user.birthDate
         rating = user.rating
         payments = user.payments
+        topics = user.topics
     }
 }

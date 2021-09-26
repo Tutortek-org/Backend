@@ -6,44 +6,55 @@ import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
 import com.karbal.tutortek.services.UserService
+import com.karbal.tutortek.utils.ApiErrorSlug
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.math.BigDecimal
 import java.util.*
 
 @RestController
-class PaymentController(val paymentService: PaymentService,
-                        val userService: UserService,
-                        val meetingService: MeetingService) {
+class PaymentController(
+    val paymentService: PaymentService,
+    val userService: UserService,
+    val meetingService: MeetingService) {
 
-    @PostMapping("/payments/add")
-    fun addPayment(@RequestBody paymentDTO: PaymentPostDTO): Payment {
+    @PostMapping("/payments")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun addPayment(@RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
+        verifyDto(paymentDTO)
         val payment = convertDtoToEntity(paymentDTO)
-        return paymentService.savePayment(payment)
+        return PaymentGetDTO(paymentService.savePayment(payment))
     }
 
     @DeleteMapping("/payments/{id}")
     fun deletePayment(@PathVariable id: Long){
         val payment = paymentService.getPayment(id)
-        if(payment.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
+        if(payment.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.PAYMENT_NOT_FOUND)
         paymentService.deletePayment(id)
     }
 
-    @GetMapping("/payments/all")
+    @GetMapping("/payments")
     fun getAllPayments() = paymentService.getAllPayments().map { p -> PaymentGetDTO(p) }
 
     @GetMapping("/payments/{id}")
     fun getPayment(@PathVariable id: Long): PaymentGetDTO {
         val payment = paymentService.getPayment(id)
-        if(payment.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
+        if(payment.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.PAYMENT_NOT_FOUND)
         return PaymentGetDTO(payment.get())
     }
 
     @PutMapping("/payments/{id}")
     fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO){
+        verifyDto(paymentDTO)
         val payment = convertDtoToEntity(paymentDTO)
         val paymentInDatabase = paymentService.getPayment(id)
-        if(paymentInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
+
+        if(paymentInDatabase.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.PAYMENT_NOT_FOUND)
+
         val extractedPayment = paymentInDatabase.get()
         extractedPayment.copy(payment)
         paymentService.savePayment(extractedPayment)
@@ -52,8 +63,22 @@ class PaymentController(val paymentService: PaymentService,
     fun convertDtoToEntity(paymentDTO: PaymentPostDTO): Payment {
         val payment = Payment()
         payment.price = paymentDTO.price
-        payment.user = userService.getUser(paymentDTO.userId).get()
-        payment.meeting = meetingService.getMeeting(paymentDTO.meetingId).get()
+
+        val user = userService.getUser(paymentDTO.userId)
+        if(user.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+
+        val meeting = meetingService.getMeeting(paymentDTO.meetingId)
+        if(meeting.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
+
+        payment.user = user.get()
+        payment.meeting = meeting.get()
         return payment
+    }
+
+    fun verifyDto(paymentDTO: PaymentPostDTO) {
+        if(paymentDTO.price < BigDecimal.ZERO)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NEGATIVE_PRICE)
     }
 }
