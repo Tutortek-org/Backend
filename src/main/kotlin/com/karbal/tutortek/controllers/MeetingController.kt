@@ -34,7 +34,7 @@ class MeetingController(val meetingService: MeetingService,
     fun addMeeting(@PathVariable topicId: Long, @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
-        val meeting = convertDtoToEntity(meetingDTO)
+        val meeting = Meeting(meetingDTO)
         meeting.topic = topic.get()
         return MeetingGetDTO(meetingService.saveMeeting(meeting))
     }
@@ -54,21 +54,11 @@ class MeetingController(val meetingService: MeetingService,
         if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
         val meeting = topic.get().meetings.find { m -> m.id == meetingId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found")
-        val meetingFromDto = convertDtoToEntity(meetingDTO)
+        val meetingFromDto = Meeting(meetingDTO)
         meetingFromDto.id = meetingId
         meetingFromDto.topic = topic.get()
         meetingFromDto.learningMaterials = meeting.learningMaterials
         meetingFromDto.payments = meeting.payments
         meetingService.saveMeeting(meetingFromDto)
-    }
-
-    fun convertDtoToEntity(meetingDTO: MeetingPostDTO): Meeting {
-        val meeting = Meeting()
-        meeting.date = meetingDTO.date
-        meeting.address = meetingDTO.address
-        meeting.description = meetingDTO.description
-        meeting.name = meetingDTO.name
-        meeting.maxAttendants = meetingDTO.maxAttendants
-        return meeting
     }
 }

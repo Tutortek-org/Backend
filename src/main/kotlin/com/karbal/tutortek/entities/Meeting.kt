@@ -1,5 +1,6 @@
 package com.karbal.tutortek.entities
 
+import com.karbal.tutortek.dto.meetingDTO.MeetingPostDTO
 import java.sql.Date
 import javax.persistence.*
 
@@ -37,14 +38,22 @@ data class Meeting(
     @JoinColumn(name = "topic_id")
     var topic: Topic = Topic()
 ) {
-    fun copy(meeting: Meeting){
-        name = meeting.name
-        date = meeting.date
-        maxAttendants = meeting.maxAttendants
-        address = meeting.address
-        description = meeting.description
-        payments = meeting.payments
-        learningMaterials = meeting.learningMaterials
-        topic = meeting.topic
-    }
+    constructor(meetingPostDTO: MeetingPostDTO) : this(
+        null,
+        meetingPostDTO.name,
+        meetingPostDTO.date,
+        meetingPostDTO.maxAttendants,
+        meetingPostDTO.address,
+        meetingPostDTO.description
+    )
+//    fun copy(meeting: Meeting){
+//        name = meeting.name
+//        date = meeting.date
+//        maxAttendants = meeting.maxAttendants
+//        address = meeting.address
+//        description = meeting.description
+//        payments = meeting.payments
+//        learningMaterials = meeting.learningMaterials
+//        topic = meeting.topic
+//    }
 }
