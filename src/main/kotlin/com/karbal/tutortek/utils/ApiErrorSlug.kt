@@ -15,5 +15,8 @@ class ApiErrorSlug {
         const val LAST_NAME_EMPTY = "Last name field is empty"
         const val BIRTH_DATE_AFTER_TODAY = "The provided birth date is after today"
         const val NEGATIVE_RATING = "A negative rating is not allowed"
+
+        // Common DTO validation errors
+        const val NAME_EMPTY = "Name field is empty"
     }
 }

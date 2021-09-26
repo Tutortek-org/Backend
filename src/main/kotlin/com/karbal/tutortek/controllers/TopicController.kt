@@ -19,6 +19,7 @@ class TopicController(
     @PostMapping("/topics")
     @ResponseStatus(HttpStatus.CREATED)
     fun addTopic(@RequestBody topicDTO: TopicPostDTO): TopicGetDTO {
+        verifyDto(topicDTO)
         val topic = convertDtoToEntity(topicDTO)
         return TopicGetDTO(topicService.saveTopic(topic))
     }
@@ -26,7 +27,8 @@ class TopicController(
     @DeleteMapping("/topics/{id}")
     fun deleteTopic(@PathVariable id: Long){
         val topic = topicService.getTopic(id)
-        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
+        if(topic.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
         topicService.deleteTopic(id)
     }
 
@@ -36,15 +38,20 @@ class TopicController(
     @GetMapping("/topics/{id}")
     fun getTopic(@PathVariable id: Long): TopicGetDTO {
         val topic = topicService.getTopic(id)
-        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
+        if(topic.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
         return TopicGetDTO(topic.get())
     }
 
     @PutMapping("/topics/{id}")
     fun updateTopic(@PathVariable id: Long, @RequestBody topicDTO: TopicPostDTO){
+        verifyDto(topicDTO)
         val topic = convertDtoToEntity(topicDTO)
         val topicInDatabase = topicService.getTopic(id)
-        if(topicInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
+
+        if(topicInDatabase.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
+
         val extractedTopic = topicInDatabase.get()
         extractedTopic.copy(topic)
         topicService.saveTopic(extractedTopic)
@@ -53,7 +60,17 @@ class TopicController(
     fun convertDtoToEntity(topicDTO: TopicPostDTO): Topic {
         val topic = Topic()
         topic.name = topicDTO.name
-        topic.user = userService.getUser(topicDTO.userId).get()
+        val user = userService.getUser(topicDTO.userId)
+
+        if(user.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+
+        topic.user = user.get()
         return topic
+    }
+
+    fun verifyDto(topicDTO: TopicPostDTO) {
+        if(topicDTO.name.isEmpty())
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NAME_EMPTY)
     }
 }
