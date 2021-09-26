@@ -6,15 +6,17 @@ import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
 import com.karbal.tutortek.services.UserService
+import com.karbal.tutortek.utils.ApiErrorSlug
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-class PaymentController(val paymentService: PaymentService,
-                        val userService: UserService,
-                        val meetingService: MeetingService) {
+class PaymentController(
+    val paymentService: PaymentService,
+    val userService: UserService,
+    val meetingService: MeetingService) {
 
     @PostMapping("/payments")
     @ResponseStatus(HttpStatus.CREATED)
@@ -26,7 +28,7 @@ class PaymentController(val paymentService: PaymentService,
     @DeleteMapping("/payments/{id}")
     fun deletePayment(@PathVariable id: Long){
         val payment = paymentService.getPayment(id)
-        if(payment.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
+        if(payment.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.PAYMENT_NOT_FOUND)
         paymentService.deletePayment(id)
     }
 
@@ -36,7 +38,7 @@ class PaymentController(val paymentService: PaymentService,
     @GetMapping("/payments/{id}")
     fun getPayment(@PathVariable id: Long): PaymentGetDTO {
         val payment = paymentService.getPayment(id)
-        if(payment.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
+        if(payment.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.PAYMENT_NOT_FOUND)
         return PaymentGetDTO(payment.get())
     }
 
@@ -44,7 +46,7 @@ class PaymentController(val paymentService: PaymentService,
     fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO){
         val payment = convertDtoToEntity(paymentDTO)
         val paymentInDatabase = paymentService.getPayment(id)
-        if(paymentInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found")
+        if(paymentInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.PAYMENT_NOT_FOUND)
         val extractedPayment = paymentInDatabase.get()
         extractedPayment.copy(payment)
         paymentService.savePayment(extractedPayment)

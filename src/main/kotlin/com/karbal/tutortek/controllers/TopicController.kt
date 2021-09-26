@@ -5,14 +5,16 @@ import com.karbal.tutortek.dto.topicDTO.TopicPostDTO
 import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.services.UserService
+import com.karbal.tutortek.utils.ApiErrorSlug
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-class TopicController(val topicService: TopicService,
-                      val userService: UserService) {
+class TopicController(
+    val topicService: TopicService,
+    val userService: UserService) {
 
     @PostMapping("/topics")
     @ResponseStatus(HttpStatus.CREATED)
@@ -24,7 +26,7 @@ class TopicController(val topicService: TopicService,
     @DeleteMapping("/topics/{id}")
     fun deleteTopic(@PathVariable id: Long){
         val topic = topicService.getTopic(id)
-        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
         topicService.deleteTopic(id)
     }
 
@@ -34,7 +36,7 @@ class TopicController(val topicService: TopicService,
     @GetMapping("/topics/{id}")
     fun getTopic(@PathVariable id: Long): TopicGetDTO {
         val topic = topicService.getTopic(id)
-        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        if(topic.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
         return TopicGetDTO(topic.get())
     }
 
@@ -42,7 +44,7 @@ class TopicController(val topicService: TopicService,
     fun updateTopic(@PathVariable id: Long, @RequestBody topicDTO: TopicPostDTO){
         val topic = convertDtoToEntity(topicDTO)
         val topicInDatabase = topicService.getTopic(id)
-        if(topicInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found")
+        if(topicInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
         val extractedTopic = topicInDatabase.get()
         extractedTopic.copy(topic)
         topicService.saveTopic(extractedTopic)

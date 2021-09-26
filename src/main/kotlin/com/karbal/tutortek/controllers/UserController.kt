@@ -4,6 +4,7 @@ import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.services.UserService
+import com.karbal.tutortek.utils.ApiErrorSlug
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -22,7 +23,7 @@ class UserController(val userService: UserService) {
     @DeleteMapping("/users/{id}")
     fun deleteUser(@PathVariable id: Long){
         val user = userService.getUser(id)
-        if(user.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        if(user.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
         userService.deleteUser(id)
     }
 
@@ -32,7 +33,7 @@ class UserController(val userService: UserService) {
     @GetMapping("/users/{id}")
     fun getUser(@PathVariable id: Long): UserGetDTO {
         val user = userService.getUser(id)
-        if(user.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        if(user.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
         return UserGetDTO(user.get())
     }
 
@@ -40,7 +41,7 @@ class UserController(val userService: UserService) {
     fun updateUser(@PathVariable id: Long, @RequestBody userDTO: UserPostDTO){
         val user = User(userDTO)
         val userInDatabase = userService.getUser(id)
-        if(userInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        if(userInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
         val extractedUser = userInDatabase.get()
         extractedUser.copy(user)
         userService.saveUser(extractedUser)
