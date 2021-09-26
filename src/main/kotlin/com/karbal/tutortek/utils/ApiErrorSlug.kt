@@ -16,6 +16,12 @@ class ApiErrorSlug {
         const val BIRTH_DATE_AFTER_TODAY = "The provided birth date is after today"
         const val NEGATIVE_RATING = "A negative rating is not allowed"
 
+        // Meeting DTO validation errors
+        const val ADDRESS_EMPTY = "Address field is empty"
+        const val DESCRIPTION_EMPTY = "Description field is empty"
+        const val TOO_FEW_MAX_ATTENDANTS = "There must be at least 1 attendant allowed"
+        const val DATE_BEFORE_TODAY = "Meeting date must be after today"
+
         // Common DTO validation errors
         const val NAME_EMPTY = "Name field is empty"
     }
