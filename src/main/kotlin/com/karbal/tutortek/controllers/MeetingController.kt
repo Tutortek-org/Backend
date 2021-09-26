@@ -33,7 +33,7 @@ class MeetingController(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
         val meeting = topic.get().meetings.find { m -> m.id == meetingId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
-        
+
         return MeetingGetDTO(meeting)
     }
 

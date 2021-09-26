@@ -22,6 +22,9 @@ class ApiErrorSlug {
         const val TOO_FEW_MAX_ATTENDANTS = "There must be at least 1 attendant allowed"
         const val DATE_BEFORE_TODAY = "Meeting date must be after today"
 
+        // Payment DTO validation errors
+        const val NEGATIVE_PRICE = "Price cannot be negative"
+
         // Common DTO validation errors
         const val NAME_EMPTY = "Name field is empty"
     }
