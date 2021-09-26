@@ -8,7 +8,7 @@ import com.karbal.tutortek.utils.ApiErrorSlug
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.util.*
+import java.sql.Date
 
 @RestController
 class UserController(val userService: UserService) {
@@ -16,6 +16,7 @@ class UserController(val userService: UserService) {
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     fun addUser(@RequestBody userDTO: UserPostDTO): UserGetDTO {
+        verifyDto(userDTO)
         val user = User(userDTO)
         return UserGetDTO(userService.saveUser(user))
     }
@@ -39,11 +40,26 @@ class UserController(val userService: UserService) {
 
     @PutMapping("/users/{id}")
     fun updateUser(@PathVariable id: Long, @RequestBody userDTO: UserPostDTO){
+        verifyDto(userDTO)
         val user = User(userDTO)
         val userInDatabase = userService.getUser(id)
         if(userInDatabase.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
         val extractedUser = userInDatabase.get()
         extractedUser.copy(user)
         userService.saveUser(extractedUser)
+    }
+
+    fun verifyDto(userDTO: UserPostDTO) {
+        if(userDTO.firstName.isEmpty())
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.FIRST_NAME_EMPTY)
+
+        if(userDTO.lastName.isEmpty())
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.LAST_NAME_EMPTY)
+
+        if(userDTO.birthDate.after(Date(System.currentTimeMillis())))
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.BIRTH_DATE_AFTER_TODAY)
+
+        if(userDTO.rating < 0)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NEGATIVE_RATING)
     }
 }
