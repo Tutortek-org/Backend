@@ -14,4 +14,6 @@ class TopicService(val database: TopicRepository) {
     fun deleteTopic(id: Long) = database.deleteById(id)
 
     fun getTopic(id: Long) = database.findById(id)
+
+    fun getFirstTopic() = database.getFirstTopic()
 }

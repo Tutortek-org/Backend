@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository
 interface TopicRepository : CrudRepository<Topic, Long> {
     @Query("SELECT * FROM topics", nativeQuery = true)
     fun getAllTopics(): List<Topic>
+
+    @Query("SELECT * FROM topics LIMIT 1", nativeQuery = true)
+    fun getFirstTopic(): Topic
 }
