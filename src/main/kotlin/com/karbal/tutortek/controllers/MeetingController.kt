@@ -13,11 +13,12 @@ import java.sql.Date
 import java.util.*
 
 @RestController
+@RequestMapping("topics/{topicId}/meetings")
 class MeetingController(
     val meetingService: MeetingService,
     val topicService: TopicService) {
 
-    @GetMapping("/topics/{topicId}/meetings")
+    @GetMapping
     fun getAllMeetings(@PathVariable topicId: Long): List<MeetingGetDTO> {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -25,7 +26,7 @@ class MeetingController(
         return topic.get().meetings.map { m -> MeetingGetDTO(m) }
     }
 
-    @GetMapping("/topics/{topicId}/meetings/{meetingId}")
+    @GetMapping("/{meetingId}")
     fun getMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long): MeetingGetDTO {
         val topic = topicService.getTopic(topicId)
 
@@ -37,7 +38,7 @@ class MeetingController(
         return MeetingGetDTO(meeting)
     }
 
-    @PostMapping("/topics/{topicId}/meetings")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addMeeting(@PathVariable topicId: Long, @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
         verifyDto(meetingDTO)
@@ -51,7 +52,8 @@ class MeetingController(
         return MeetingGetDTO(meetingService.saveMeeting(meeting))
     }
 
-    @DeleteMapping("/topics/{topicId}/meetings/{meetingId}")
+    @DeleteMapping("/{meetingId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long) {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -61,8 +63,10 @@ class MeetingController(
         meeting.id?.let { meetingService.deleteMeeting(it) }
     }
 
-    @PutMapping("/topics/{topicId}/meetings/{meetingId}")
-    fun updateMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long, @RequestBody meetingDTO: MeetingPostDTO) {
+    @PutMapping("/{meetingId}")
+    fun updateMeeting(@PathVariable topicId: Long,
+                      @PathVariable meetingId: Long,
+                      @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
         verifyDto(meetingDTO)
         val topic = topicService.getTopic(topicId)
 
@@ -77,7 +81,7 @@ class MeetingController(
         meetingFromDto.learningMaterials = meeting.learningMaterials
         meetingFromDto.payments = meeting.payments
 
-        meetingService.saveMeeting(meetingFromDto)
+        return MeetingGetDTO(meetingService.saveMeeting(meetingFromDto))
     }
 
     fun verifyDto(meetingDTO: MeetingPostDTO) {

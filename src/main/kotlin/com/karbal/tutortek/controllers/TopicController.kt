@@ -12,11 +12,12 @@ import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
+@RequestMapping("topics")
 class TopicController(
     val topicService: TopicService,
     val userService: UserService) {
 
-    @PostMapping("/topics")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addTopic(@RequestBody topicDTO: TopicPostDTO): TopicGetDTO {
         verifyDto(topicDTO)
@@ -24,7 +25,8 @@ class TopicController(
         return TopicGetDTO(topicService.saveTopic(topic))
     }
 
-    @DeleteMapping("/topics/{id}")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteTopic(@PathVariable id: Long){
         val topic = topicService.getTopic(id)
         if(topic.isEmpty)
@@ -32,10 +34,10 @@ class TopicController(
         topicService.deleteTopic(id)
     }
 
-    @GetMapping("/topics")
+    @GetMapping
     fun getAllTopics() = topicService.getAllTopics().map { t -> TopicGetDTO(t) }
 
-    @GetMapping("/topics/{id}")
+    @GetMapping("/{id}")
     fun getTopic(@PathVariable id: Long): TopicGetDTO {
         val topic = topicService.getTopic(id)
         if(topic.isEmpty)
@@ -43,8 +45,8 @@ class TopicController(
         return TopicGetDTO(topic.get())
     }
 
-    @PutMapping("/topics/{id}")
-    fun updateTopic(@PathVariable id: Long, @RequestBody topicDTO: TopicPostDTO){
+    @PutMapping("/{id}")
+    fun updateTopic(@PathVariable id: Long, @RequestBody topicDTO: TopicPostDTO): TopicGetDTO {
         verifyDto(topicDTO)
         val topic = convertDtoToEntity(topicDTO)
         val topicInDatabase = topicService.getTopic(id)
@@ -54,7 +56,7 @@ class TopicController(
 
         val extractedTopic = topicInDatabase.get()
         extractedTopic.copy(topic)
-        topicService.saveTopic(extractedTopic)
+        return TopicGetDTO(topicService.saveTopic(extractedTopic))
     }
 
     fun convertDtoToEntity(topicDTO: TopicPostDTO): Topic {
