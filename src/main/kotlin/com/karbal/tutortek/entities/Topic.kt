@@ -14,7 +14,7 @@ data class Topic(
     @Column(name = "name", nullable = false)
     var name: String = "",
 
-    @OneToMany(mappedBy = "topic")
+    @OneToMany(mappedBy = "topic", cascade = [CascadeType.REMOVE])
     var meetings: MutableList<Meeting> = mutableListOf(),
 
     @ManyToOne

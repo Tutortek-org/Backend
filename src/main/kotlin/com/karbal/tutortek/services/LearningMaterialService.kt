@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
 @Service
-class LearningMaterialService(
-    val database: LearningMaterialRepository,
-    val entityManager: EntityManager) {
+class LearningMaterialService(val database: LearningMaterialRepository) {
 
     fun getAllLearningMaterials(): List<LearningMaterial> = database.getAllLearningMaterials()
 
@@ -19,10 +17,5 @@ class LearningMaterialService(
 
     fun getLearningMaterial(id: Long) = database.findById(id)
 
-    @Transactional
-    fun clearLearningMaterials() {
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate()
-        database.clearLearningMaterials()
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate()
-    }
+    fun clearLearningMaterials() = database.deleteAll()
 }
