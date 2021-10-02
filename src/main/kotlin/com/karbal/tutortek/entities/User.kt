@@ -25,10 +25,10 @@ data class User(
     @Column(name = "rating", nullable = false)
     var rating: Float = 0.0F,
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
     var payments: MutableList<Payment> = mutableListOf(),
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
     var topics: MutableList<Topic> = mutableListOf()
 ){
     constructor(userPostDTO: UserPostDTO) : this(

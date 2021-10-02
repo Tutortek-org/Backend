@@ -28,10 +28,10 @@ data class Meeting(
     @Column(name = "description", nullable = false)
     var description: String = "",
 
-    @OneToMany(mappedBy = "meeting")
+    @OneToMany(mappedBy = "meeting", cascade = [CascadeType.REMOVE])
     var payments: MutableList<Payment> = mutableListOf(),
 
-    @OneToMany(mappedBy = "meeting")
+    @OneToMany(mappedBy = "meeting", cascade = [CascadeType.REMOVE])
     var learningMaterials: MutableList<LearningMaterial> = mutableListOf(),
 
     @ManyToOne
@@ -46,14 +46,4 @@ data class Meeting(
         meetingPostDTO.address,
         meetingPostDTO.description
     )
-//    fun copy(meeting: Meeting){
-//        name = meeting.name
-//        date = meeting.date
-//        maxAttendants = meeting.maxAttendants
-//        address = meeting.address
-//        description = meeting.description
-//        payments = meeting.payments
-//        learningMaterials = meeting.learningMaterials
-//        topic = meeting.topic
-//    }
 }
