@@ -14,4 +14,6 @@ class UserService(val database: UserRepository) {
     fun deleteUser(id: Long) = database.deleteById(id)
 
     fun getUser(id: Long) = database.findById(id)
+
+    fun getFirstUser() = database.getFirstUser()
 }

@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository
 interface UserRepository : CrudRepository<User, Long> {
     @Query("SELECT * FROM users", nativeQuery = true)
     fun getAllUsers(): List<User>
+
+    @Query("SELECT * FROM users LIMIT 1", nativeQuery = true)
+    fun getFirstUser(): User
 }
