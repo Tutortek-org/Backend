@@ -1,34 +1,30 @@
 package com.karbal.tutortek.data_loaders
 
-import com.karbal.tutortek.entities.Meeting
+import com.karbal.tutortek.entities.LearningMaterial
+import com.karbal.tutortek.services.LearningMaterialService
 import com.karbal.tutortek.services.MeetingService
-import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.utils.CommandLineArguments
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
-import java.sql.Date
 
 @Component
-@Order(3)
-class MeetingLoader(
-    private val meetingService: MeetingService,
-    private val topicService: TopicService
+@Order(4)
+class LearningMaterialLoader(
+    private val learningMaterialService: LearningMaterialService,
+    private val meetingService: MeetingService
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
         if(args!!.sourceArgs.contains(CommandLineArguments.POPULATE)) {
-            val topic = topicService.getFirstTopic()
-            val date = Date(System.currentTimeMillis() + 1000000)
-            meetingService.saveMeeting(Meeting(
+            val meeting = meetingService.getFirstMeeting()
+            learningMaterialService.saveLearningMaterial(LearningMaterial(
                 null,
-                "Populated meeting",
-                date,
-                5,
-                "Populated address",
+                "Populated material",
                 "Populated description",
-                topic = topic
+                "populated.com/link",
+                meeting
             ))
         }
     }

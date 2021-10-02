@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository
 interface MeetingRepository : CrudRepository<Meeting, Long> {
     @Query("SELECT * FROM meetings", nativeQuery = true)
     fun getAllMeetings(): List<Meeting>
+
+    @Query("SELECT * FROM meetings LIMIT 1", nativeQuery = true)
+    fun getFirstMeeting(): Meeting
 }

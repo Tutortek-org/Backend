@@ -14,4 +14,6 @@ class MeetingService(val database: MeetingRepository) {
     fun deleteMeeting(id: Long) = database.deleteById(id)
 
     fun getMeeting(id: Long) = database.findById(id)
+
+    fun getFirstMeeting() = database.getFirstMeeting()
 }
