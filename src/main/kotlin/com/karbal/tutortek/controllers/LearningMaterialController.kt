@@ -13,12 +13,13 @@ import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
+@RequestMapping("topics/{topicId}/meetings/{meetingId}/materials")
 class LearningMaterialController(
     val learningMaterialService: LearningMaterialService,
     val topicService: TopicService
 ) {
 
-    @GetMapping("/topics/{topicId}/meetings/{meetingId}/materials")
+    @GetMapping
     fun getAllLearningMaterials(@PathVariable topicId: Long, @PathVariable meetingId: Long): List<LearningMaterialGetDTO> {
         val topic = topicService.getTopic(topicId)
 
@@ -31,7 +32,7 @@ class LearningMaterialController(
         return meeting.learningMaterials.map { lm -> LearningMaterialGetDTO(lm) }
     }
 
-    @GetMapping("/topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
+    @GetMapping("/{materialId}")
     fun getLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long): LearningMaterialGetDTO {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -46,7 +47,7 @@ class LearningMaterialController(
         return LearningMaterialGetDTO(learningMaterial)
     }
 
-    @PostMapping("/topics/{topicId}/meetings/{meetingId}/materials")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addLearningMaterial(@PathVariable topicId: Long,
                             @PathVariable meetingId: Long,
@@ -64,7 +65,8 @@ class LearningMaterialController(
         return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(learningMaterial))
     }
 
-    @DeleteMapping("/topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
+    @DeleteMapping("/{materialId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long) {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -79,11 +81,11 @@ class LearningMaterialController(
         learningMaterial.id?.let { learningMaterialService.deleteLearningMaterial(it) }
     }
 
-    @PutMapping("/topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
+    @PutMapping("/{materialId}")
     fun updateLearningMaterial(@PathVariable topicId: Long,
                                @PathVariable meetingId: Long,
                                @PathVariable materialId: Long,
-                               @RequestBody learningMaterialDTO: LearningMaterialPostDTO) {
+                               @RequestBody learningMaterialDTO: LearningMaterialPostDTO): LearningMaterialGetDTO {
         verifyDto(learningMaterialDTO)
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -98,7 +100,7 @@ class LearningMaterialController(
         val learningMaterialFromDto = LearningMaterial(learningMaterialDTO)
         learningMaterialFromDto.id = materialId
         learningMaterialFromDto.meeting = meeting
-        learningMaterialService.saveLearningMaterial(learningMaterialFromDto)
+        return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(learningMaterialFromDto))
     }
 
     fun verifyDto(learningMaterialDTO: LearningMaterialPostDTO) {

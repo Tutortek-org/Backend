@@ -13,7 +13,7 @@ import java.sql.Date
 import java.util.*
 
 @RestController
-@RequestMapping("/topics/{topicId}/meetings")
+@RequestMapping("topics/{topicId}/meetings")
 class MeetingController(
     val meetingService: MeetingService,
     val topicService: TopicService) {
