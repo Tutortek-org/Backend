@@ -11,7 +11,9 @@ import java.text.SimpleDateFormat
 @Component
 class UserLoader(private val userService: UserService) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
-        val parsedDate = SimpleDateFormat("yyyy-mm-dd").parse("2000-02-03")
-        userService.saveUser(User(null, "Karolis", "Balciunas", Date(parsedDate.time),5.0F))
+        if(args!!.sourceArgs.contains("--populate")) {
+            val parsedDate = SimpleDateFormat("yyyy-mm-dd").parse("2000-02-03")
+            userService.saveUser(User(null, "Karolis", "Balciunas", Date(parsedDate.time),5.0F))
+        }
     }
 }
