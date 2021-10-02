@@ -11,9 +11,10 @@ import org.springframework.web.server.ResponseStatusException
 import java.sql.Date
 
 @RestController
+@RequestMapping("users")
 class UserController(val userService: UserService) {
 
-    @PostMapping("/users")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addUser(@RequestBody userDTO: UserPostDTO): UserGetDTO {
         verifyDto(userDTO)
@@ -21,7 +22,8 @@ class UserController(val userService: UserService) {
         return UserGetDTO(userService.saveUser(user))
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteUser(@PathVariable id: Long){
         val user = userService.getUser(id)
         if(user.isEmpty)
@@ -29,10 +31,10 @@ class UserController(val userService: UserService) {
         userService.deleteUser(id)
     }
 
-    @GetMapping("/users")
+    @GetMapping
     fun getAllUsers() = userService.getAllUsers().map { u -> UserGetDTO(u) }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     fun getUser(@PathVariable id: Long): UserGetDTO {
         val user = userService.getUser(id)
         if(user.isEmpty)
@@ -40,8 +42,8 @@ class UserController(val userService: UserService) {
         return UserGetDTO(user.get())
     }
 
-    @PutMapping("/users/{id}")
-    fun updateUser(@PathVariable id: Long, @RequestBody userDTO: UserPostDTO){
+    @PutMapping("/{id}")
+    fun updateUser(@PathVariable id: Long, @RequestBody userDTO: UserPostDTO): UserGetDTO {
         verifyDto(userDTO)
         val user = User(userDTO)
         val userInDatabase = userService.getUser(id)
@@ -51,7 +53,7 @@ class UserController(val userService: UserService) {
 
         val extractedUser = userInDatabase.get()
         extractedUser.copy(user)
-        userService.saveUser(extractedUser)
+        return UserGetDTO(userService.saveUser(extractedUser))
     }
 
     fun verifyDto(userDTO: UserPostDTO) {
