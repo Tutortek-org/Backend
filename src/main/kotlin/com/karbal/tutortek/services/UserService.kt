@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
 @Service
-class UserService(
-    val database: UserRepository,
-    val entityManager: EntityManager) {
+class UserService(val database: UserRepository) {
 
     fun getAllUsers(): List<User> = database.getAllUsers()
 
@@ -21,10 +19,5 @@ class UserService(
 
     fun getFirstUser() = database.getFirstUser()
 
-    @Transactional
-    fun clearUsers() {
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate()
-        database.clearUsers()
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate()
-    }
+    fun clearUsers() = database.deleteAll()
 }

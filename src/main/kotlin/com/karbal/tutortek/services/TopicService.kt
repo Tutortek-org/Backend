@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
 @Service
-class TopicService(
-    val database: TopicRepository,
-    val entityManager: EntityManager) {
+class TopicService(val database: TopicRepository) {
 
     fun getAllTopics(): List<Topic> = database.getAllTopics()
 
@@ -21,10 +19,5 @@ class TopicService(
 
     fun getFirstTopic() = database.getFirstTopic()
 
-    @Transactional
-    fun clearTopics() {
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate()
-        database.clearTopics()
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate()
-    }
+    fun clearTopics() = database.deleteAll()
 }

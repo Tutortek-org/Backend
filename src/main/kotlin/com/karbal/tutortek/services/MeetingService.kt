@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
 @Service
-class MeetingService(
-    val database: MeetingRepository,
-    val entityManager: EntityManager) {
+class MeetingService(val database: MeetingRepository) {
 
     fun getAllMeetings(): List<Meeting> = database.getAllMeetings()
 
@@ -21,10 +19,5 @@ class MeetingService(
 
     fun getFirstMeeting() = database.getFirstMeeting()
 
-    @Transactional
-    fun clearMeetings() {
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate()
-        database.clearMeetings()
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate()
-    }
+    fun clearMeetings() = database.deleteAll()
 }

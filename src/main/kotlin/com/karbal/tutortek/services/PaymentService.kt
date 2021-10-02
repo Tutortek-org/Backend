@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
 @Service
-class PaymentService(
-    val database: PaymentRepository,
-    val entityManager: EntityManager) {
+class PaymentService(val database: PaymentRepository) {
 
     fun getAllPayments(): List<Payment> = database.getAllPayments()
 
@@ -19,10 +17,5 @@ class PaymentService(
 
     fun getPayment(id: Long) = database.findById(id)
 
-    @Transactional
-    fun clearPayments() {
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate()
-        database.clearPayments()
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate()
-    }
+    fun clearPayments() = database.deleteAll()
 }
