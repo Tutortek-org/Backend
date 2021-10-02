@@ -14,12 +14,13 @@ import java.math.BigDecimal
 import java.util.*
 
 @RestController
+@RequestMapping("payments")
 class PaymentController(
     val paymentService: PaymentService,
     val userService: UserService,
     val meetingService: MeetingService) {
 
-    @PostMapping("/payments")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addPayment(@RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
         verifyDto(paymentDTO)
@@ -27,18 +28,19 @@ class PaymentController(
         return PaymentGetDTO(paymentService.savePayment(payment))
     }
 
-    @DeleteMapping("/payments/{id}")
-    fun deletePayment(@PathVariable id: Long){
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deletePayment(@PathVariable id: Long) {
         val payment = paymentService.getPayment(id)
         if(payment.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.PAYMENT_NOT_FOUND)
         paymentService.deletePayment(id)
     }
 
-    @GetMapping("/payments")
+    @GetMapping
     fun getAllPayments() = paymentService.getAllPayments().map { p -> PaymentGetDTO(p) }
 
-    @GetMapping("/payments/{id}")
+    @GetMapping("/{id}")
     fun getPayment(@PathVariable id: Long): PaymentGetDTO {
         val payment = paymentService.getPayment(id)
         if(payment.isEmpty)
@@ -46,8 +48,8 @@ class PaymentController(
         return PaymentGetDTO(payment.get())
     }
 
-    @PutMapping("/payments/{id}")
-    fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO){
+    @PutMapping("/{id}")
+    fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
         verifyDto(paymentDTO)
         val payment = convertDtoToEntity(paymentDTO)
         val paymentInDatabase = paymentService.getPayment(id)
@@ -57,7 +59,7 @@ class PaymentController(
 
         val extractedPayment = paymentInDatabase.get()
         extractedPayment.copy(payment)
-        paymentService.savePayment(extractedPayment)
+        return PaymentGetDTO(paymentService.savePayment(extractedPayment))
     }
 
     fun convertDtoToEntity(paymentDTO: PaymentPostDTO): Payment {
