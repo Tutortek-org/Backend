@@ -18,7 +18,8 @@ class MeetingLoader(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.POPULATE)) {
+        if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
+            meetingService.clearMeetings()
             val topic = topicService.getFirstTopic()
             val date = Date(System.currentTimeMillis() + 1000000)
             meetingService.saveMeeting(Meeting(

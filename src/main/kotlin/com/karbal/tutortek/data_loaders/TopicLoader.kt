@@ -16,7 +16,8 @@ class TopicLoader(
     private val userService: UserService) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.POPULATE)) {
+        if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
+            topicService.clearTopics()
             val user = userService.getFirstUser()
             topicService.saveTopic(Topic(null, "Populated topic", user = user))
         }

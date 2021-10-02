@@ -20,7 +20,8 @@ class PaymentLoader(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.POPULATE)) {
+        if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
+            paymentService.clearPayments()
             val user = userService.getFirstUser()
             val meeting = meetingService.getFirstMeeting()
             paymentService.savePayment(Payment(

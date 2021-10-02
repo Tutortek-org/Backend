@@ -17,7 +17,8 @@ class LearningMaterialLoader(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.POPULATE)) {
+        if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
+            learningMaterialService.clearLearningMaterials()
             val meeting = meetingService.getFirstMeeting()
             learningMaterialService.saveLearningMaterial(LearningMaterial(
                 null,

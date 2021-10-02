@@ -14,7 +14,8 @@ import java.text.SimpleDateFormat
 @Order(1)
 class UserLoader(private val userService: UserService) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.POPULATE)) {
+        if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
+            userService.clearUsers()
             val parsedDate = SimpleDateFormat("yyyy-mm-dd").parse("2000-02-03")
             userService.saveUser(User(null, "Karolis", "Balciunas", Date(parsedDate.time),5.0F))
         }
