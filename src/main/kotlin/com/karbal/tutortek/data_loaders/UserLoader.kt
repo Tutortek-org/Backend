@@ -17,7 +17,14 @@ class UserLoader(private val userService: UserService) : ApplicationRunner {
         if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
             userService.clearUsers()
             val parsedDate = SimpleDateFormat("yyyy-mm-dd").parse("2000-02-03")
-            userService.saveUser(User(null, "Karolis", "Balciunas", Date(parsedDate.time),5.0F))
+            userService.saveUser(User(
+                null,
+                "Karolis",
+                "Balciunas",
+                Date(parsedDate.time),
+                5.0F,
+                "populated@email.com"
+            ))
         }
     }
 }
