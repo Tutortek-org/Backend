@@ -5,11 +5,13 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.stereotype.Component
 import java.io.Serializable
 import java.util.*
 import java.util.function.Function
 import kotlin.collections.HashMap
 
+@Component
 class JwtTokenUtil : Serializable {
 
     private val serialVersionUID = -2550185165626007488L
@@ -18,9 +20,9 @@ class JwtTokenUtil : Serializable {
     @Value("\${jwt.secret}")
     private val secret: String = ""
 
-    fun getUsernameFromToken(token: String) = getClaimFromToken(token, Claims::getSubject)
+    fun getUsernameFromToken(token: String): String = getClaimFromToken(token, Claims::getSubject)
 
-    fun getExpirationDateFromToken(token: String) = getClaimFromToken(token, Claims::getExpiration)
+    fun getExpirationDateFromToken(token: String): Date = getClaimFromToken(token, Claims::getExpiration)
 
     private fun <T> getClaimFromToken(token: String, claimsResolver: Function<Claims, T>): T {
         val claims = getAllClaimsFromToken(token)
