@@ -25,26 +25,22 @@ data class UserProfile(
     @Column(name = "rating", nullable = false)
     var rating: Float = 0.0F,
 
-    @Column(name = "email", nullable = false, unique = true)
-    var email: String = "",
-
-    @Column(name = "password", nullable = false)
-    var password: String = "",
-
     @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.REMOVE])
     var payments: MutableList<Payment> = mutableListOf(),
 
     @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.REMOVE])
-    var topics: MutableList<Topic> = mutableListOf()
+    var topics: MutableList<Topic> = mutableListOf(),
+
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    var user: User = User()
 ){
     constructor(userProfilePostDTO: UserProfilePostDTO) : this(
         null,
         userProfilePostDTO.firstName,
         userProfilePostDTO.lastName,
         userProfilePostDTO.birthDate,
-        userProfilePostDTO.rating,
-        userProfilePostDTO.email,
-        userProfilePostDTO.password
+        userProfilePostDTO.rating
     )
 
     fun copy(userProfile: UserProfile){
@@ -52,9 +48,8 @@ data class UserProfile(
         lastName = userProfile.lastName
         birthDate = userProfile.birthDate
         rating = userProfile.rating
-        email = userProfile.email
-        password = userProfile.password
         payments = userProfile.payments
         topics = userProfile.topics
+        user = userProfile.user
     }
 }

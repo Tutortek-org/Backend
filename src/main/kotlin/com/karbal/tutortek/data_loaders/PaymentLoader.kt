@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
 @Component
-@Order(5)
+@Order(6)
 class PaymentLoader(
     private val paymentService: PaymentService,
     private val userProfileService: UserProfileService,

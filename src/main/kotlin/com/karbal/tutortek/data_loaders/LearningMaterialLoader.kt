@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 @Component
-@Order(4)
+@Order(5)
 class LearningMaterialLoader(
     private val learningMaterialService: LearningMaterialService,
     private val meetingService: MeetingService

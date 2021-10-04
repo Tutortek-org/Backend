@@ -2,6 +2,7 @@ package com.karbal.tutortek.data_loaders
 
 import com.karbal.tutortek.entities.UserProfile
 import com.karbal.tutortek.services.UserProfileService
+import com.karbal.tutortek.services.UserService
 import com.karbal.tutortek.utils.CommandLineArguments
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
@@ -12,20 +13,26 @@ import java.sql.Date
 import java.text.SimpleDateFormat
 
 @Component
-@Order(1)
-class UserProfileLoader(private val userProfileService: UserProfileService) : ApplicationRunner {
+@Order(2)
+class UserProfileLoader(
+    private val userProfileService: UserProfileService,
+    private val userService: UserService
+) : ApplicationRunner {
+
     override fun run(args: ApplicationArguments?) {
         if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
             userProfileService.clearUserProfiles()
+
             val parsedDate = SimpleDateFormat("yyyy-mm-dd").parse("2000-02-03")
+            val user = userService.getFirstUser()
+
             userProfileService.saveUserProfile(UserProfile(
                 null,
                 "Karolis",
                 "Balciunas",
                 Date(parsedDate.time),
                 5.0F,
-                "populated@email.com",
-                BCryptPasswordEncoder().encode("PopulatedPassword")
+                user = user
             ))
         }
     }
