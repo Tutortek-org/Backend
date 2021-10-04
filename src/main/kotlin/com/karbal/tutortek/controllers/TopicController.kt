@@ -4,18 +4,17 @@ import com.karbal.tutortek.dto.topicDTO.TopicGetDTO
 import com.karbal.tutortek.dto.topicDTO.TopicPostDTO
 import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.services.TopicService
-import com.karbal.tutortek.services.UserService
+import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.utils.ApiErrorSlug
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.util.*
 
 @RestController
 @RequestMapping("topics")
 class TopicController(
     val topicService: TopicService,
-    val userService: UserService) {
+    val userProfileService: UserProfileService) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -62,12 +61,12 @@ class TopicController(
     fun convertDtoToEntity(topicDTO: TopicPostDTO): Topic {
         val topic = Topic()
         topic.name = topicDTO.name
-        val user = userService.getUser(topicDTO.userId)
+        val user = userProfileService.getUserProfile(topicDTO.userId)
 
         if(user.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
 
-        topic.user = user.get()
+        topic.userProfile = user.get()
         return topic
     }
 

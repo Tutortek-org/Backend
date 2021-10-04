@@ -5,19 +5,18 @@ import com.karbal.tutortek.dto.paymentDTO.PaymentPostDTO
 import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
-import com.karbal.tutortek.services.UserService
+import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.utils.ApiErrorSlug
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
-import java.util.*
 
 @RestController
 @RequestMapping("payments")
 class PaymentController(
     val paymentService: PaymentService,
-    val userService: UserService,
+    val userProfileService: UserProfileService,
     val meetingService: MeetingService) {
 
     @PostMapping
@@ -66,7 +65,7 @@ class PaymentController(
         val payment = Payment()
         payment.price = paymentDTO.price
 
-        val user = userService.getUser(paymentDTO.userId)
+        val user = userProfileService.getUserProfile(paymentDTO.userId)
         if(user.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
 
@@ -74,7 +73,7 @@ class PaymentController(
         if(meeting.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
 
-        payment.user = user.get()
+        payment.userProfile = user.get()
         payment.meeting = meeting.get()
         return payment
     }

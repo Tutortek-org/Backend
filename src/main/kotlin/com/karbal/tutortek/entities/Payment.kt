@@ -20,8 +20,8 @@ data class Payment(
     var price: BigDecimal = BigDecimal(0.0),
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    var user: User = User(),
+    @JoinColumn(name = "user_profile_id", nullable = false)
+    var userProfile: UserProfile = UserProfile(),
 
     @ManyToOne
     @JoinColumn(name = "meeting_id")
@@ -30,7 +30,7 @@ data class Payment(
     fun copy(payment: Payment){
         date = payment.date
         price = payment.price
-        user = payment.user
+        userProfile = payment.userProfile
         meeting = payment.meeting
     }
 }

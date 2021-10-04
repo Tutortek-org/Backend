@@ -1,7 +1,7 @@
 package com.karbal.tutortek.data_loaders
 
-import com.karbal.tutortek.entities.User
-import com.karbal.tutortek.services.UserService
+import com.karbal.tutortek.entities.UserProfile
+import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.utils.CommandLineArguments
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
@@ -13,12 +13,12 @@ import java.text.SimpleDateFormat
 
 @Component
 @Order(1)
-class UserLoader(private val userService: UserService) : ApplicationRunner {
+class UserProfileLoader(private val userProfileService: UserProfileService) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
-            userService.clearUsers()
+            userProfileService.clearUserProfiles()
             val parsedDate = SimpleDateFormat("yyyy-mm-dd").parse("2000-02-03")
-            userService.saveUser(User(
+            userProfileService.saveUserProfile(UserProfile(
                 null,
                 "Karolis",
                 "Balciunas",

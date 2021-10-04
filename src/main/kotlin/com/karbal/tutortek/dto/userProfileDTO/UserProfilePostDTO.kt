@@ -1,8 +1,8 @@
-package com.karbal.tutortek.dto.userDTO
+package com.karbal.tutortek.dto.userProfileDTO
 
 import java.sql.Date
 
-data class UserPostDTO(
+data class UserProfilePostDTO(
     val firstName: String,
     val lastName: String,
     val rating: Float,
