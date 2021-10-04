@@ -6,6 +6,7 @@ import com.karbal.tutortek.utils.CommandLineArguments
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.annotation.Order
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 import java.sql.Date
 import java.text.SimpleDateFormat
@@ -17,7 +18,15 @@ class UserLoader(private val userService: UserService) : ApplicationRunner {
         if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
             userService.clearUsers()
             val parsedDate = SimpleDateFormat("yyyy-mm-dd").parse("2000-02-03")
-            userService.saveUser(User(null, "Karolis", "Balciunas", Date(parsedDate.time),5.0F))
+            userService.saveUser(User(
+                null,
+                "Karolis",
+                "Balciunas",
+                Date(parsedDate.time),
+                5.0F,
+                "populated@email.com",
+                BCryptPasswordEncoder().encode("PopulatedPassword")
+            ))
         }
     }
 }
