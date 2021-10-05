@@ -16,8 +16,8 @@ class JwtUserDetailsService(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(username: String?): UserDetails {
-        if(username == "javainuse")
-            return User("javainuse", "\$2a\$10\$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6", arrayListOf())
+        val user = username?.let { userRepository.findByEmail(it) }
+        if(user != null) return User(user.email, user.password, arrayListOf())
         else throw UsernameNotFoundException("User not found with username: $username")
     }
 
