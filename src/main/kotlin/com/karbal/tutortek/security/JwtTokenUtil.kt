@@ -41,7 +41,12 @@ class JwtTokenUtil : Serializable {
 
     private fun doGenerateToken(claims: HashMap<String, Any>, subject: String) = Jwts.builder().setClaims(claims)
         .setSubject(subject).setIssuedAt(Date(System.currentTimeMillis()))
-        .setExpiration(Date(System.currentTimeMillis() + SecurityConstants.TOKEN_VALIDITY_TIME))
+        .setExpiration(Date(System.currentTimeMillis() + SecurityConstants.TOKEN_EXPIRATION))
+        .signWith(SignatureAlgorithm.HS512, secret).compact()
+
+    fun doGenerateRefreshToken(claims: HashMap<String, Any>, subject: String) = Jwts.builder().setClaims(claims)
+        .setSubject(subject).setIssuedAt(Date(System.currentTimeMillis()))
+        .setExpiration(Date(System.currentTimeMillis() + SecurityConstants.REFRESH_EXPIRATION))
         .signWith(SignatureAlgorithm.HS512, secret).compact()
 
     fun validateToken(token: String, userDetails: UserDetails): Boolean {
