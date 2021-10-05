@@ -38,7 +38,7 @@ class WebSecurityConfig(
 
     override fun configure(http: HttpSecurity?) {
         http?.csrf()?.disable()
-            ?.authorizeRequests()?.antMatchers("/authenticate")?.permitAll()
+            ?.authorizeRequests()?.antMatchers("/authenticate", "/register")?.permitAll()
             ?.anyRequest()?.authenticated()?.and()
             ?.exceptionHandling()?.authenticationEntryPoint(jwtAuthenticationEntryPoint)?.and()
             ?.sessionManagement()?.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

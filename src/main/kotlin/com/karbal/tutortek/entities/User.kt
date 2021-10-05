@@ -1,5 +1,6 @@
 package com.karbal.tutortek.entities
 
+import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import javax.persistence.*
 
 @Entity
@@ -19,4 +20,10 @@ data class User(
 
     @OneToOne(mappedBy = "user", cascade = [CascadeType.REMOVE])
     var userProfile: UserProfile? = null
-)
+) {
+    constructor(userPostDTO: UserPostDTO) : this(
+        null,
+        userPostDTO.username,
+        userPostDTO.password
+    )
+}
