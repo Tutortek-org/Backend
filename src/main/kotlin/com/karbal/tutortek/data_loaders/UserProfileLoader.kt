@@ -3,11 +3,10 @@ package com.karbal.tutortek.data_loaders
 import com.karbal.tutortek.entities.UserProfile
 import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.services.UserService
-import com.karbal.tutortek.utils.CommandLineArguments
+import com.karbal.tutortek.constants.CommandLineArguments
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.annotation.Order
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 import java.sql.Date
 import java.text.SimpleDateFormat

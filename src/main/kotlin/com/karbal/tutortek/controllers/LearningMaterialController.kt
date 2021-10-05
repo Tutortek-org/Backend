@@ -4,13 +4,11 @@ import com.karbal.tutortek.dto.learningMaterialDTO.LearningMaterialGetDTO
 import com.karbal.tutortek.dto.learningMaterialDTO.LearningMaterialPostDTO
 import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
-import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.TopicService
-import com.karbal.tutortek.utils.ApiErrorSlug
+import com.karbal.tutortek.constants.ApiErrorSlug
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.util.*
 
 @RestController
 @RequestMapping("topics/{topicId}/meetings/{meetingId}/materials")

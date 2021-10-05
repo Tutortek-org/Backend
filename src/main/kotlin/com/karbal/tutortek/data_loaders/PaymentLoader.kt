@@ -4,7 +4,7 @@ import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
 import com.karbal.tutortek.services.UserProfileService
-import com.karbal.tutortek.utils.CommandLineArguments
+import com.karbal.tutortek.constants.CommandLineArguments
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.annotation.Order

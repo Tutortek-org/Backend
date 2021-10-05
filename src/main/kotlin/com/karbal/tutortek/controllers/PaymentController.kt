@@ -6,7 +6,7 @@ import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
 import com.karbal.tutortek.services.UserProfileService
-import com.karbal.tutortek.utils.ApiErrorSlug
+import com.karbal.tutortek.constants.ApiErrorSlug
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException

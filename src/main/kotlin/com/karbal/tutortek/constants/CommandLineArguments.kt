@@ -1,4 +1,4 @@
-package com.karbal.tutortek.utils
+package com.karbal.tutortek.constants
 
 class CommandLineArguments {
     companion object {

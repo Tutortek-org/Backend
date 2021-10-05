@@ -3,7 +3,7 @@ package com.karbal.tutortek.data_loaders
 import com.karbal.tutortek.entities.Meeting
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.TopicService
-import com.karbal.tutortek.utils.CommandLineArguments
+import com.karbal.tutortek.constants.CommandLineArguments
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.annotation.Order
