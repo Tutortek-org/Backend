@@ -14,7 +14,6 @@ import kotlin.collections.HashMap
 @Component
 class JwtTokenUtil : Serializable {
 
-    private val serialVersionUID = -2550185165626007488L
     private val JWT_TOKEN_VALIDITY = 18000
 
     @Value("\${jwt.secret}")
