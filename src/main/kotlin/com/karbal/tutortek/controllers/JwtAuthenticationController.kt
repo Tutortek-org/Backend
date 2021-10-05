@@ -2,6 +2,7 @@ package com.karbal.tutortek.controllers
 
 import com.karbal.tutortek.dto.jwtDTO.JwtGetDTO
 import com.karbal.tutortek.dto.jwtDTO.JwtPostDTO
+import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.JwtUserDetailsService
 import org.springframework.security.authentication.AuthenticationManager
@@ -28,6 +29,9 @@ class JwtAuthenticationController(
         val token = jwtTokenUtil.generateToken(userDetails)
         return JwtGetDTO(token)
     }
+
+    @PostMapping("/register")
+    fun saveUser(@RequestBody userPostDTO: UserPostDTO) = userDetailsService.save(userPostDTO)
 
     private fun authenticate(username: String, password: String) {
         try {
