@@ -1,5 +1,7 @@
 package com.karbal.tutortek.controllers
 
+import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.dto.jwtDTO.JwtGetDTO
 import com.karbal.tutortek.dto.jwtDTO.JwtPostDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
@@ -22,7 +24,7 @@ class JwtAuthenticationController(
     val userDetailsService: JwtUserDetailsService
 ) {
 
-    @PostMapping("/authenticate")
+    @PostMapping(SecurityConstants.LOGIN_ENDPOINT)
     fun createAuthenticationToken(@RequestBody authenticationRequest: JwtPostDTO): JwtGetDTO {
         authenticate(authenticationRequest.username, authenticationRequest.password)
         val userDetails = userDetailsService.loadUserByUsername(authenticationRequest.username)
@@ -30,7 +32,7 @@ class JwtAuthenticationController(
         return JwtGetDTO(token)
     }
 
-    @PostMapping("/register")
+    @PostMapping(SecurityConstants.REGISTER_ENDPOINT)
     fun saveUser(@RequestBody userPostDTO: UserPostDTO) = userDetailsService.save(userPostDTO)
 
     private fun authenticate(username: String, password: String) {
@@ -38,10 +40,10 @@ class JwtAuthenticationController(
             authenticationManager.authenticate(UsernamePasswordAuthenticationToken(username, password))
         }
         catch (e: DisabledException) {
-            throw Exception("User is disabled", e)
+            throw Exception(ApiErrorSlug.ACCOUNT_DISABLED, e)
         }
         catch (e: BadCredentialsException) {
-            throw Exception("Invalid credentials", e)
+            throw Exception(ApiErrorSlug.INVALID_CREDENTIALS, e)
         }
     }
 }

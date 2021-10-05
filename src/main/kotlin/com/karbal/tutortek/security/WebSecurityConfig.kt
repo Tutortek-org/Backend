@@ -1,5 +1,6 @@
 package com.karbal.tutortek.security
 
+import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.services.JwtUserDetailsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -36,8 +37,8 @@ class WebSecurityConfig(
 
     override fun configure(http: HttpSecurity?) {
         http?.csrf()?.disable()
-            ?.authorizeRequests()?.antMatchers("/authenticate", "/register")?.permitAll()
-            ?.anyRequest()?.authenticated()?.and()
+            ?.authorizeRequests()?.antMatchers(SecurityConstants.LOGIN_ENDPOINT, SecurityConstants.REGISTER_ENDPOINT)
+            ?.permitAll()?.anyRequest()?.authenticated()?.and()
             ?.exceptionHandling()?.authenticationEntryPoint(jwtAuthenticationEntryPoint)?.and()
             ?.sessionManagement()?.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 

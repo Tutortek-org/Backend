@@ -1,5 +1,6 @@
 package com.karbal.tutortek.security
 
+import com.karbal.tutortek.constants.SecurityConstants
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -13,8 +14,6 @@ import kotlin.collections.HashMap
 
 @Component
 class JwtTokenUtil : Serializable {
-
-    private val JWT_TOKEN_VALIDITY = 18000
 
     @Value("\${jwt.secret}")
     private val secret: String = ""
@@ -42,7 +41,7 @@ class JwtTokenUtil : Serializable {
 
     private fun doGenerateToken(claims: HashMap<String, Any>, subject: String) = Jwts.builder().setClaims(claims)
         .setSubject(subject).setIssuedAt(Date(System.currentTimeMillis()))
-        .setExpiration(Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+        .setExpiration(Date(System.currentTimeMillis() + SecurityConstants.TOKEN_VALIDITY_TIME))
         .signWith(SignatureAlgorithm.HS512, secret).compact()
 
     fun validateToken(token: String, userDetails: UserDetails): Boolean {

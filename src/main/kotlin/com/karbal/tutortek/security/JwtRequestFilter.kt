@@ -1,5 +1,6 @@
 package com.karbal.tutortek.security
 
+import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.services.JwtUserDetailsService
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -17,13 +18,13 @@ class JwtRequestFilter(
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
-        val requestTokenHeader = request.getHeader("Authorization")
+        val requestTokenHeader = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER)
 
         var username: String? = null
         var jwtToken = ""
 
-        if(requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7)
+        if(requestTokenHeader != null && requestTokenHeader.startsWith(SecurityConstants.TOKEN_BEGINNING)) {
+            jwtToken = requestTokenHeader.substring(SecurityConstants.TOKEN_BEGINNING.length)
             username = jwtTokenUtil.getUsernameFromToken(jwtToken)
         }
 
