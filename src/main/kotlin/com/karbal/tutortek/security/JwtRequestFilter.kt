@@ -48,7 +48,7 @@ class JwtRequestFilter(
 
     private fun allowForRefreshToken(exception: ExpiredJwtException, request: HttpServletRequest) {
         SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(null, null, null)
-        request.setAttribute("claims", exception.claims)
+        request.setAttribute(SecurityConstants.CLAIMS_ATTRIBUTE, exception.claims)
     }
 
     private fun setAuthenticationTokenOnSecurityContext(username: String?, jwtToken: String, request: HttpServletRequest) {

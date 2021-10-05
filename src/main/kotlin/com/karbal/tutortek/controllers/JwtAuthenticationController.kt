@@ -7,14 +7,13 @@ import com.karbal.tutortek.dto.jwtDTO.JwtPostDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.JwtUserDetailsService
+import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @CrossOrigin
@@ -34,6 +33,20 @@ class JwtAuthenticationController(
 
     @PostMapping(SecurityConstants.REGISTER_ENDPOINT)
     fun saveUser(@RequestBody userPostDTO: UserPostDTO) = userDetailsService.save(userPostDTO)
+
+    @GetMapping(SecurityConstants.REFRESH_ENDPOINT)
+    fun refreshToken(request: HttpServletRequest): JwtGetDTO {
+        val claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims
+        val expectedMap = getMapFromIoJwtClaims(claims)
+        val token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap["sub"].toString())
+        return JwtGetDTO(token)
+    }
+
+    private fun getMapFromIoJwtClaims(claims: DefaultClaims): HashMap<String, Any> {
+        val expectedMap = hashMapOf<String, Any>()
+        claims.forEach { key, value -> expectedMap[key] = value }
+        return expectedMap
+    }
 
     private fun authenticate(username: String, password: String) {
         try {

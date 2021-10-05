@@ -10,5 +10,6 @@ class SecurityConstants {
         const val LOGIN_ENDPOINT = "/login"
         const val REGISTER_ENDPOINT = "/register"
         const val REFRESH_ENDPOINT = "/refresh"
+        const val CLAIMS_ATTRIBUTE = "claims"
     }
 }
