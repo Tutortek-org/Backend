@@ -25,7 +25,7 @@ class MeetingController(
         return topic.get().meetings.map { m -> MeetingGetDTO(m) }
     }
 
-    @GetMapping("/{meetingId}")
+    @GetMapping("{meetingId}")
     fun getMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long): MeetingGetDTO {
         val topic = topicService.getTopic(topicId)
 
@@ -51,7 +51,7 @@ class MeetingController(
         return MeetingGetDTO(meetingService.saveMeeting(meeting))
     }
 
-    @DeleteMapping("/{meetingId}")
+    @DeleteMapping("{meetingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long) {
         val topic = topicService.getTopic(topicId)
@@ -62,7 +62,7 @@ class MeetingController(
         meeting.id?.let { meetingService.deleteMeeting(it) }
     }
 
-    @PutMapping("/{meetingId}")
+    @PutMapping("{meetingId}")
     fun updateMeeting(@PathVariable topicId: Long,
                       @PathVariable meetingId: Long,
                       @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {

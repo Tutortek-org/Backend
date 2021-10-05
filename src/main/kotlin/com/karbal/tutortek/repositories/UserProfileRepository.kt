@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface UserProfileRepository : CrudRepository<UserProfile, Long> {
-    @Query("SELECT * FROM userProfiles", nativeQuery = true)
+    @Query("SELECT * FROM user_profiles", nativeQuery = true)
     fun getAllUserProfiles(): List<UserProfile>
 
     @Query("SELECT * FROM user_profiles LIMIT 1", nativeQuery = true)

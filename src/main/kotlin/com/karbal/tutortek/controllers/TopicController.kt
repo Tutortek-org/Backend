@@ -24,7 +24,7 @@ class TopicController(
         return TopicGetDTO(topicService.saveTopic(topic))
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteTopic(@PathVariable id: Long){
         val topic = topicService.getTopic(id)
@@ -36,7 +36,7 @@ class TopicController(
     @GetMapping
     fun getAllTopics() = topicService.getAllTopics().map { t -> TopicGetDTO(t) }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     fun getTopic(@PathVariable id: Long): TopicGetDTO {
         val topic = topicService.getTopic(id)
         if(topic.isEmpty)
@@ -44,7 +44,7 @@ class TopicController(
         return TopicGetDTO(topic.get())
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     fun updateTopic(@PathVariable id: Long, @RequestBody topicDTO: TopicPostDTO): TopicGetDTO {
         verifyDto(topicDTO)
         val topic = convertDtoToEntity(topicDTO)

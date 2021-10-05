@@ -27,7 +27,7 @@ class PaymentController(
         return PaymentGetDTO(paymentService.savePayment(payment))
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deletePayment(@PathVariable id: Long) {
         val payment = paymentService.getPayment(id)
@@ -39,7 +39,7 @@ class PaymentController(
     @GetMapping
     fun getAllPayments() = paymentService.getAllPayments().map { p -> PaymentGetDTO(p) }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     fun getPayment(@PathVariable id: Long): PaymentGetDTO {
         val payment = paymentService.getPayment(id)
         if(payment.isEmpty)
@@ -47,7 +47,7 @@ class PaymentController(
         return PaymentGetDTO(payment.get())
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
         verifyDto(paymentDTO)
         val payment = convertDtoToEntity(paymentDTO)

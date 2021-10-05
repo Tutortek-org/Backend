@@ -30,7 +30,7 @@ class LearningMaterialController(
         return meeting.learningMaterials.map { lm -> LearningMaterialGetDTO(lm) }
     }
 
-    @GetMapping("/{materialId}")
+    @GetMapping("{materialId}")
     fun getLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long): LearningMaterialGetDTO {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -63,7 +63,7 @@ class LearningMaterialController(
         return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(learningMaterial))
     }
 
-    @DeleteMapping("/{materialId}")
+    @DeleteMapping("{materialId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long) {
         val topic = topicService.getTopic(topicId)
@@ -79,7 +79,7 @@ class LearningMaterialController(
         learningMaterial.id?.let { learningMaterialService.deleteLearningMaterial(it) }
     }
 
-    @PutMapping("/{materialId}")
+    @PutMapping("{materialId}")
     fun updateLearningMaterial(@PathVariable topicId: Long,
                                @PathVariable meetingId: Long,
                                @PathVariable materialId: Long,

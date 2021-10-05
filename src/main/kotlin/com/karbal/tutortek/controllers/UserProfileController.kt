@@ -22,7 +22,7 @@ class UserProfileController(val userProfileService: UserProfileService) {
         return UserProfileGetDTO(userProfileService.saveUserProfile(userProfile))
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteUserProfile(@PathVariable id: Long){
         val userProfile = userProfileService.getUserProfile(id)
@@ -34,7 +34,7 @@ class UserProfileController(val userProfileService: UserProfileService) {
     @GetMapping
     fun getAllUserProfiles() = userProfileService.getAllUserProfiles().map { up -> UserProfileGetDTO(up) }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     fun getUserProfile(@PathVariable id: Long): UserProfileGetDTO {
         val userProfile = userProfileService.getUserProfile(id)
         if(userProfile.isEmpty)
@@ -42,7 +42,7 @@ class UserProfileController(val userProfileService: UserProfileService) {
         return UserProfileGetDTO(userProfile.get())
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     fun updateUserProfile(@PathVariable id: Long, @RequestBody userProfileDTO: UserProfilePostDTO): UserProfileGetDTO {
         verifyDto(userProfileDTO)
         val userProfile = UserProfile(userProfileDTO)
