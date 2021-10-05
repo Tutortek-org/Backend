@@ -20,16 +20,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class WebSecurityConfig(
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     private val jwtUserDetailsService: JwtUserDetailsService,
-    private val jwtRequestFilter: JwtRequestFilter
+    private val jwtRequestFilter: JwtRequestFilter,
+    private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) : WebSecurityConfigurerAdapter() {
 
     @Autowired
     fun configureGlobal(authenticationManagerBuilder: AuthenticationManagerBuilder) {
-        authenticationManagerBuilder.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder())
+        authenticationManagerBuilder.userDetailsService(jwtUserDetailsService).passwordEncoder(bCryptPasswordEncoder)
     }
-
-    @Bean
-    fun passwordEncoder() = BCryptPasswordEncoder()
 
     @Bean
     override fun authenticationManagerBean(): AuthenticationManager {
