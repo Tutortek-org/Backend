@@ -1,5 +1,6 @@
 package com.karbal.tutortek.security
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.services.JwtUserDetailsService
 import io.jsonwebtoken.ExpiredJwtException
@@ -33,16 +34,19 @@ class JwtRequestFilter(
                 setAuthenticationTokenOnSecurityContext(username, jwtToken, request)
         }
         catch (e: ExpiredJwtException) {
-            handleExpiredJwt(request, e)
+            handleExpiredJwt(request, response, e)
         }
         chain.doFilter(request, response)
     }
 
-    private fun handleExpiredJwt(request: HttpServletRequest, e: ExpiredJwtException) {
+    private fun handleExpiredJwt(request: HttpServletRequest, response: HttpServletResponse, e: ExpiredJwtException) {
         val requestUrl = request.requestURL.toString()
         if (requestUrl.contains(SecurityConstants.REFRESH_ENDPOINT))
             allowForRefreshToken(e, request)
-        else request.setAttribute("exception", e)
+        else {
+            request.setAttribute("exception", e)
+            response.addHeader("exception", e.toString())
+        }
     }
 
     private fun allowForRefreshToken(exception: ExpiredJwtException, request: HttpServletRequest) {
