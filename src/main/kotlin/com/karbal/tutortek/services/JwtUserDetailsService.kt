@@ -2,6 +2,7 @@ package com.karbal.tutortek.services
 
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.repositories.UserRepository
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -15,10 +16,12 @@ class JwtUserDetailsService(
     val bcryptEncoder: PasswordEncoder
 ) : UserDetailsService {
 
-    override fun loadUserByUsername(username: String?): UserDetails {
-        val user = username?.let { userRepository.findByEmail(it) }
-        if(user != null) return User(user.email, user.password, arrayListOf())
-        else throw UsernameNotFoundException("User not found with username: $username")
+    override fun loadUserByUsername(email: String?): UserDetails {
+        val user = email?.let { userRepository.findByEmail(it) }
+            ?: throw UsernameNotFoundException("User not found with email: $email")
+
+        val roles = arrayListOf(SimpleGrantedAuthority(user.role.toString()))
+        return User(user.email, user.password, roles)
     }
 
     fun save(userPostDTO: UserPostDTO): com.karbal.tutortek.entities.User {

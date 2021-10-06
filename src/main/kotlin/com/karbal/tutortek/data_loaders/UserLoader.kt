@@ -3,6 +3,7 @@ package com.karbal.tutortek.data_loaders
 import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.services.UserService
 import com.karbal.tutortek.constants.CommandLineArguments
+import com.karbal.tutortek.security.Role
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.annotation.Order
@@ -18,7 +19,8 @@ class UserLoader(private val userService: UserService) : ApplicationRunner {
             userService.saveUser(User(
                 null,
                 "populated@email.com",
-                BCryptPasswordEncoder().encode("PopulatedPassword")
+                BCryptPasswordEncoder().encode("PopulatedPassword"),
+                Role.ADMIN
             ))
         }
     }
