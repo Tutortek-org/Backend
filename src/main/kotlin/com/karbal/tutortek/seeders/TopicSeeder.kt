@@ -1,4 +1,4 @@
-package com.karbal.tutortek.data_loaders
+package com.karbal.tutortek.seeders
 
 import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.services.TopicService
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component
 
 @Component
 @Order(3)
-class TopicLoader(
+class TopicSeeder(
     private val topicService: TopicService,
     private val userProfileService: UserProfileService) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
+        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
             topicService.clearTopics()
             val user = userProfileService.getFirstUserProfile()
             topicService.saveTopic(Topic(null, "Populated topic", userProfile = user))

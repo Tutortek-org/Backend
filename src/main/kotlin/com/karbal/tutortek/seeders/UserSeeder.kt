@@ -1,4 +1,4 @@
-package com.karbal.tutortek.data_loaders
+package com.karbal.tutortek.seeders
 
 import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.services.UserService
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component
 
 @Component
 @Order(1)
-class UserLoader(private val userService: UserService) : ApplicationRunner {
+class UserSeeder(private val userService: UserService) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
+        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
             userService.clearUsers()
             userService.saveUser(User(
                 null,

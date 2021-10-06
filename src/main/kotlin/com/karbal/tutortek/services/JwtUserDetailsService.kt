@@ -1,5 +1,6 @@
 package com.karbal.tutortek.services
 
+import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.repositories.UserRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -18,7 +19,7 @@ class JwtUserDetailsService(
 
     override fun loadUserByUsername(email: String?): UserDetails {
         val user = email?.let { userRepository.findByEmail(it) }
-            ?: throw UsernameNotFoundException("User not found with email: $email")
+            ?: throw UsernameNotFoundException(ApiErrorSlug.EMAIL_NOT_FOUND + email)
 
         val roles = arrayListOf(SimpleGrantedAuthority(user.role.toString()))
         return User(user.email, user.password, roles)

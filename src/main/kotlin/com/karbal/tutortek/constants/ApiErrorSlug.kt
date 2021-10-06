@@ -30,6 +30,7 @@ class ApiErrorSlug {
         // JWT errors
         const val ACCOUNT_DISABLED = "Account is disabled"
         const val INVALID_CREDENTIALS = "Invalid credentials"
+        const val EMAIL_NOT_FOUND = "User not found with email: "
 
         // User errors
         const val USERNAME_TOO_SHORT = "Username must be at least 5 characters"

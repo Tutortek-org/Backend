@@ -1,4 +1,4 @@
-package com.karbal.tutortek.data_loaders
+package com.karbal.tutortek.seeders
 
 import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component
 
 @Component
 @Order(5)
-class LearningMaterialLoader(
+class LearningMaterialSeeder(
     private val learningMaterialService: LearningMaterialService,
     private val meetingService: MeetingService
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.REPOPULATE)) {
+        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
             learningMaterialService.clearLearningMaterials()
             val meeting = meetingService.getFirstMeeting()
             learningMaterialService.saveLearningMaterial(LearningMaterial(
