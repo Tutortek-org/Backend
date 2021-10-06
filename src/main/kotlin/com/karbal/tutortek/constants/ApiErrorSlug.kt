@@ -31,6 +31,10 @@ class ApiErrorSlug {
         const val ACCOUNT_DISABLED = "Account is disabled"
         const val INVALID_CREDENTIALS = "Invalid credentials"
 
+        // User errors
+        const val USERNAME_TOO_SHORT = "Username must be at least 5 characters"
+        const val PASSWORD_TOO_SHORT = "Password must be at least 8 characters"
+
         // Common DTO validation errors
         const val NAME_EMPTY = "Name field is empty"
         const val DESCRIPTION_EMPTY = "Description field is empty"

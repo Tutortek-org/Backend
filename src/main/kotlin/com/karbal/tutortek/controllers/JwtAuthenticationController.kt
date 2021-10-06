@@ -4,15 +4,18 @@ import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.dto.jwtDTO.JwtGetDTO
 import com.karbal.tutortek.dto.jwtDTO.JwtPostDTO
+import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.JwtUserDetailsService
 import io.jsonwebtoken.impl.DefaultClaims
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import javax.servlet.http.HttpServletRequest
 
 @RestController
@@ -32,7 +35,11 @@ class JwtAuthenticationController(
     }
 
     @PostMapping(SecurityConstants.REGISTER_ENDPOINT)
-    fun saveUser(@RequestBody userPostDTO: UserPostDTO) = userDetailsService.save(userPostDTO)
+    @ResponseStatus(HttpStatus.CREATED)
+    fun saveUser(@RequestBody userPostDTO: UserPostDTO): UserGetDTO {
+        verifyDto(userPostDTO)
+        return UserGetDTO(userDetailsService.save(userPostDTO))
+    }
 
     @GetMapping(SecurityConstants.REFRESH_ENDPOINT)
     fun refreshToken(request: HttpServletRequest): JwtGetDTO {
@@ -58,5 +65,13 @@ class JwtAuthenticationController(
         catch (e: BadCredentialsException) {
             throw Exception(ApiErrorSlug.INVALID_CREDENTIALS, e)
         }
+    }
+
+    private fun verifyDto(userPostDTO: UserPostDTO) {
+        if(userPostDTO.username.length < 5)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USERNAME_TOO_SHORT)
+
+        if(userPostDTO.password.length < 8)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.PASSWORD_TOO_SHORT)
     }
 }
