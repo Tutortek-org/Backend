@@ -39,9 +39,8 @@ class JwtRequestFilter(
     }
 
     private fun handleExpiredJwt(request: HttpServletRequest, e: ExpiredJwtException) {
-        val isRefreshToken = request.getHeader(SecurityConstants.REFRESH_TOKEN_HEADER)
         val requestUrl = request.requestURL.toString()
-        if (isRefreshToken == "true" && requestUrl.contains(SecurityConstants.REFRESH_ENDPOINT))
+        if (requestUrl.contains(SecurityConstants.REFRESH_ENDPOINT))
             allowForRefreshToken(e, request)
         else request.setAttribute("exception", e)
     }

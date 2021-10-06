@@ -3,7 +3,6 @@ package com.karbal.tutortek.constants
 class SecurityConstants {
     companion object {
         const val AUTHORIZATION_HEADER = "Authorization"
-        const val REFRESH_TOKEN_HEADER = "isRefreshToken"
         const val CLAIMS_ATTRIBUTE = "claims"
         const val TOKEN_BEGINNING = "Bearer "
 
