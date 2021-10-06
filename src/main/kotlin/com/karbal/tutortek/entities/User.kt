@@ -1,6 +1,7 @@
 package com.karbal.tutortek.entities
 
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
+import com.karbal.tutortek.security.Role
 import javax.persistence.*
 
 @Entity
@@ -18,12 +19,16 @@ data class User(
     @Column(name = "password", nullable = false)
     var password: String = "",
 
+    @Column(name = "role", nullable = false)
+    var role: Role = Role.STUDENT,
+
     @OneToOne(mappedBy = "user", cascade = [CascadeType.REMOVE])
     var userProfile: UserProfile? = null
 ) {
     constructor(userPostDTO: UserPostDTO) : this(
         null,
         userPostDTO.username,
-        userPostDTO.password
+        userPostDTO.password,
+        userPostDTO.role
     )
 }
