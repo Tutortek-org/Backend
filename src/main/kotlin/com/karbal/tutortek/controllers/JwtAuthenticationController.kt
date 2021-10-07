@@ -8,7 +8,10 @@ import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.JwtUserDetailsService
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.impl.DefaultClaims
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
@@ -25,6 +28,9 @@ class JwtAuthenticationController(
     val jwtTokenUtil: JwtTokenUtil,
     val userDetailsService: JwtUserDetailsService
 ) {
+
+    @Value("\${jwt.secret}")
+    private val secret: String = ""
 
     @PostMapping(SecurityConstants.LOGIN_ENDPOINT)
     fun createAuthenticationToken(@RequestBody authenticationRequest: JwtPostDTO): JwtGetDTO {
@@ -43,15 +49,25 @@ class JwtAuthenticationController(
 
     @GetMapping(SecurityConstants.REFRESH_ENDPOINT)
     fun refreshToken(request: HttpServletRequest): JwtGetDTO {
-        val claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims
+        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
+        if(claims == null) claims = parseClaimsFromHeader(request)
         val expectedMap = getMapFromIoJwtClaims(claims)
         val token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap["sub"].toString())
         return JwtGetDTO(token)
     }
 
-    private fun getMapFromIoJwtClaims(claims: DefaultClaims): HashMap<String, Any> {
+    private fun parseClaimsFromHeader(request: HttpServletRequest): DefaultClaims? {
+        val requestTokenHeader = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER)
+        if(requestTokenHeader != null && requestTokenHeader.startsWith(SecurityConstants.TOKEN_BEGINNING)) {
+            val jwtToken = requestTokenHeader.substring(SecurityConstants.TOKEN_BEGINNING.length)
+            return Jwts.parser().setSigningKey(secret).parseClaimsJws(jwtToken).body as DefaultClaims?
+        }
+        return null
+    }
+
+    private fun getMapFromIoJwtClaims(claims: DefaultClaims?): HashMap<String, Any> {
         val expectedMap = hashMapOf<String, Any>()
-        claims.forEach { key, value -> expectedMap[key] = value }
+        claims?.forEach { key, value -> expectedMap[key] = value }
         return expectedMap
     }
 

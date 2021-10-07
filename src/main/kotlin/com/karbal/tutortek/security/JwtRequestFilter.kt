@@ -1,6 +1,5 @@
 package com.karbal.tutortek.security
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.services.JwtUserDetailsService
 import io.jsonwebtoken.ExpiredJwtException
