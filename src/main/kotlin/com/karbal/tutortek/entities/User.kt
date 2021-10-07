@@ -1,7 +1,7 @@
 package com.karbal.tutortek.entities
 
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
-import java.sql.Date
+import com.karbal.tutortek.security.Role
 import javax.persistence.*
 
 @Entity
@@ -13,38 +13,22 @@ data class User(
     @SequenceGenerator(name = "user_generator", sequenceName = "user_seq", allocationSize = 1)
     var id: Long? = null,
 
-    @Column(name = "firstName", nullable = false)
-    var firstName: String = "",
+    @Column(name = "email", nullable = false, unique = true)
+    var email: String = "",
 
-    @Column(name = "lastName", nullable = false)
-    var lastName: String = "",
+    @Column(name = "password", nullable = false)
+    var password: String = "",
 
-    @Column(name = "birthDate", nullable = false)
-    var birthDate: Date = Date(System.currentTimeMillis()),
+    @Column(name = "role", nullable = false)
+    var role: Role = Role.STUDENT,
 
-    @Column(name = "rating", nullable = false)
-    var rating: Float = 0.0F,
-
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
-    var payments: MutableList<Payment> = mutableListOf(),
-
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
-    var topics: MutableList<Topic> = mutableListOf()
-){
+    @OneToOne(mappedBy = "user", cascade = [CascadeType.REMOVE])
+    var userProfile: UserProfile? = null
+) {
     constructor(userPostDTO: UserPostDTO) : this(
         null,
-        userPostDTO.firstName,
-        userPostDTO.lastName,
-        userPostDTO.birthDate,
-        userPostDTO.rating
+        userPostDTO.email,
+        userPostDTO.password,
+        userPostDTO.role
     )
-
-    fun copy(user: User){
-        firstName = user.firstName
-        lastName = user.lastName
-        birthDate = user.birthDate
-        rating = user.rating
-        payments = user.payments
-        topics = user.topics
-    }
 }

@@ -5,12 +5,13 @@ import com.karbal.tutortek.dto.meetingDTO.MeetingPostDTO
 import com.karbal.tutortek.entities.Meeting
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.TopicService
-import com.karbal.tutortek.utils.ApiErrorSlug
+import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.security.Role
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.sql.Date
-import java.util.*
 
 @RestController
 @RequestMapping("topics/{topicId}/meetings")
@@ -26,7 +27,7 @@ class MeetingController(
         return topic.get().meetings.map { m -> MeetingGetDTO(m) }
     }
 
-    @GetMapping("/{meetingId}")
+    @GetMapping("{meetingId}")
     fun getMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long): MeetingGetDTO {
         val topic = topicService.getTopic(topicId)
 
@@ -40,6 +41,7 @@ class MeetingController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun addMeeting(@PathVariable topicId: Long, @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
         verifyDto(meetingDTO)
         val topic = topicService.getTopic(topicId)
@@ -52,8 +54,9 @@ class MeetingController(
         return MeetingGetDTO(meetingService.saveMeeting(meeting))
     }
 
-    @DeleteMapping("/{meetingId}")
+    @DeleteMapping("{meetingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun deleteMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long) {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -63,7 +66,8 @@ class MeetingController(
         meeting.id?.let { meetingService.deleteMeeting(it) }
     }
 
-    @PutMapping("/{meetingId}")
+    @PutMapping("{meetingId}")
+    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun updateMeeting(@PathVariable topicId: Long,
                       @PathVariable meetingId: Long,
                       @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
