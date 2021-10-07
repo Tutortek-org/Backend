@@ -7,7 +7,9 @@ import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
 import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.security.Role
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
@@ -37,6 +39,7 @@ class PaymentController(
     }
 
     @GetMapping
+    @Secured(Role.ADMIN_ANNOTATION)
     fun getAllPayments() = paymentService.getAllPayments().map { p -> PaymentGetDTO(p) }
 
     @GetMapping("{id}")
