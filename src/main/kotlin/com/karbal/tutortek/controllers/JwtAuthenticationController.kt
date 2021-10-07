@@ -67,7 +67,7 @@ class JwtAuthenticationController(
         val requestTokenHeader = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER)
         if(requestTokenHeader != null && requestTokenHeader.startsWith(SecurityConstants.TOKEN_BEGINNING)) {
             val jwtToken = requestTokenHeader.substring(SecurityConstants.TOKEN_BEGINNING.length)
-            return Jwts.parser().setSigningKey(secret).parseClaimsJws(jwtToken).body as DefaultClaims?
+            return jwtTokenUtil.getAllClaimsFromToken(jwtToken) as DefaultClaims?
         }
         return null
     }

@@ -27,7 +27,7 @@ class JwtTokenUtil : Serializable {
         return claimsResolver.apply(claims)
     }
 
-    private fun getAllClaimsFromToken(token: String): Claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
+    fun getAllClaimsFromToken(token: String): Claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
 
     private fun isTokenExpired(token: String): Boolean {
         val expiration = getExpirationDateFromToken(token)
