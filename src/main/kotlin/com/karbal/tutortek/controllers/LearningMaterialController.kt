@@ -6,7 +6,9 @@ import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
 import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.security.Role
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
@@ -47,6 +49,7 @@ class LearningMaterialController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun addLearningMaterial(@PathVariable topicId: Long,
                             @PathVariable meetingId: Long,
                             @RequestBody learningMaterialDTO: LearningMaterialPostDTO): LearningMaterialGetDTO {
@@ -65,6 +68,7 @@ class LearningMaterialController(
 
     @DeleteMapping("{materialId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun deleteLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long) {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -80,6 +84,7 @@ class LearningMaterialController(
     }
 
     @PutMapping("{materialId}")
+    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun updateLearningMaterial(@PathVariable topicId: Long,
                                @PathVariable meetingId: Long,
                                @PathVariable materialId: Long,
