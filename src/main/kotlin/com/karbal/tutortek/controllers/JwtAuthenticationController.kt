@@ -8,7 +8,6 @@ import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.JwtUserDetailsService
-import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.beans.factory.annotation.Value
@@ -19,6 +18,7 @@ import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.util.regex.Pattern
 import javax.servlet.http.HttpServletRequest
 
 @RestController
@@ -34,8 +34,8 @@ class JwtAuthenticationController(
 
     @PostMapping(SecurityConstants.LOGIN_ENDPOINT)
     fun createAuthenticationToken(@RequestBody authenticationRequest: JwtPostDTO): JwtGetDTO {
-        authenticate(authenticationRequest.username, authenticationRequest.password)
-        val userDetails = userDetailsService.loadUserByUsername(authenticationRequest.username)
+        authenticate(authenticationRequest.email, authenticationRequest.password)
+        val userDetails = userDetailsService.loadUserByUsername(authenticationRequest.email)
         val token = jwtTokenUtil.generateToken(userDetails)
         return JwtGetDTO(token)
     }
@@ -84,10 +84,21 @@ class JwtAuthenticationController(
     }
 
     private fun verifyDto(userPostDTO: UserPostDTO) {
-        if(userPostDTO.username.length < 5)
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USERNAME_TOO_SHORT)
+        if(!validateEmail(userPostDTO.email))
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.EMAIL_NOT_VALID)
 
         if(userPostDTO.password.length < 8)
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.PASSWORD_TOO_SHORT)
+    }
+
+    private fun validateEmail(email: String): Boolean {
+        return Pattern.compile(
+            "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]|[\\w-]{2,}))@"
+                    + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                    + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                    + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                    + "[0-9]{1,2}|25[0-5]|2[0-4][0-9]))|"
+                    + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$"
+        ).matcher(email).matches()
     }
 }

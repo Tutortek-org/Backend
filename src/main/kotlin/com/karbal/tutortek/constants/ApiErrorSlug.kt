@@ -33,8 +33,8 @@ class ApiErrorSlug {
         const val EMAIL_NOT_FOUND = "User not found with email: "
 
         // User errors
-        const val USERNAME_TOO_SHORT = "Username must be at least 5 characters"
         const val PASSWORD_TOO_SHORT = "Password must be at least 8 characters"
+        const val EMAIL_NOT_VALID = "Entered email is not in a valid format"
 
         // Common DTO validation errors
         const val NAME_EMPTY = "Name field is empty"

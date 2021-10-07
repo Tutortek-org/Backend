@@ -27,7 +27,7 @@ data class User(
 ) {
     constructor(userPostDTO: UserPostDTO) : this(
         null,
-        userPostDTO.username,
+        userPostDTO.email,
         userPostDTO.password,
         userPostDTO.role
     )
