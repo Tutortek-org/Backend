@@ -8,6 +8,7 @@ import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.JwtUserDetailsService
+import com.karbal.tutortek.services.UserService
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.beans.factory.annotation.Value
@@ -26,7 +27,8 @@ import javax.servlet.http.HttpServletRequest
 class JwtAuthenticationController(
     val authenticationManager: AuthenticationManager,
     val jwtTokenUtil: JwtTokenUtil,
-    val userDetailsService: JwtUserDetailsService
+    val userDetailsService: JwtUserDetailsService,
+    val userService: UserService
 ) {
 
     @Value("\${jwt.secret}")
@@ -44,6 +46,11 @@ class JwtAuthenticationController(
     @ResponseStatus(HttpStatus.CREATED)
     fun saveUser(@RequestBody userPostDTO: UserPostDTO): UserGetDTO {
         verifyDto(userPostDTO)
+
+        val userCount = userService.getUserCountByEmail(userPostDTO.email)
+        if(userCount > 0)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USER_ALREADY_EXISTS)
+
         return UserGetDTO(userDetailsService.save(userPostDTO))
     }
 

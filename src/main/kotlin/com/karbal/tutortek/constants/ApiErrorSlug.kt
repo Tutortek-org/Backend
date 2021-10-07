@@ -35,6 +35,7 @@ class ApiErrorSlug {
         // User errors
         const val PASSWORD_TOO_SHORT = "Password must be at least 8 characters"
         const val EMAIL_NOT_VALID = "Entered email is not in a valid format"
+        const val USER_ALREADY_EXISTS = "A user with that email is already registered"
 
         // Common DTO validation errors
         const val NAME_EMPTY = "Name field is empty"

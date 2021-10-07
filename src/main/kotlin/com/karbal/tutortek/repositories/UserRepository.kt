@@ -14,4 +14,7 @@ interface UserRepository : CrudRepository<User, Long> {
 
     @Query("SELECT * FROM users LIMIT 1", nativeQuery = true)
     fun getFirstUser(): User
+
+    @Query("SELECT COUNT(*) FROM users WHERE email = :email LIMIT 1", nativeQuery = true)
+    fun getUserCountByEmail(@Param("email") email: String): Int
 }
