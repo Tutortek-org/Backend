@@ -21,7 +21,8 @@ class JwtUserDetailsService(
         val user = email?.let { userRepository.findByEmail(it) }
             ?: throw UsernameNotFoundException(ApiErrorSlug.EMAIL_NOT_FOUND + email)
 
-        val roles = arrayListOf(SimpleGrantedAuthority("ROLE_" + user.role))
+        //val roles = arrayListOf(SimpleGrantedAuthority("ROLE_" + user.role))
+        val roles = user.roles.map { role -> SimpleGrantedAuthority("ROLE_${role.name}") }
         return User(user.email, user.password, roles)
     }
 

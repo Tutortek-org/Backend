@@ -19,8 +19,8 @@ class UserSeeder(private val userService: UserService) : ApplicationRunner {
             userService.saveUser(User(
                 null,
                 "populated@email.com",
-                BCryptPasswordEncoder().encode("PopulatedPassword"),
-                Role.ADMIN
+                BCryptPasswordEncoder().encode("PopulatedPassword")
+                //Role.ADMIN
             ))
         }
     }
