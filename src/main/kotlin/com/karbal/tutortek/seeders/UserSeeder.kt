@@ -20,7 +20,6 @@ class UserSeeder(private val userService: UserService) : ApplicationRunner {
                 null,
                 "populated@email.com",
                 BCryptPasswordEncoder().encode("PopulatedPassword")
-                //Role.ADMIN
             ))
         }
     }

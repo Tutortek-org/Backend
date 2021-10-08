@@ -10,4 +10,6 @@ class RoleService(val database: RoleRepository) {
     fun clearRoles() = database.deleteAll()
 
     fun saveRole(roleEntity: RoleEntity) = database.save(roleEntity)
+
+    fun getRole(id: Long) = database.findById(id)
 }

@@ -19,20 +19,17 @@ data class User(
     @Column(name = "password", nullable = false)
     var password: String = "",
 
-//    @Column(name = "role", nullable = false)
-//    var role: Role = Role.STUDENT,
-
-    @ManyToMany(cascade = [CascadeType.REMOVE])
-    @JoinTable(name = "user_role", joinColumns = [JoinColumn(name = "user_id")], inverseJoinColumns = [JoinColumn(name = "role_id")])
-    var roles: MutableSet<RoleEntity> = mutableSetOf(),
-
     @OneToOne(mappedBy = "user", cascade = [CascadeType.REMOVE])
     var userProfile: UserProfile? = null
 ) {
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE])
+    @JoinTable(name = "user_role", joinColumns = [JoinColumn(name = "user_id")], inverseJoinColumns = [JoinColumn(name = "role_id")])
+    var roles: MutableSet<RoleEntity> = mutableSetOf()
+
     constructor(userPostDTO: UserPostDTO) : this(
         null,
         userPostDTO.email,
         userPostDTO.password
-        //userPostDTO.role
     )
 }

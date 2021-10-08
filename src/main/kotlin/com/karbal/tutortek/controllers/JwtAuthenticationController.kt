@@ -8,6 +8,7 @@ import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.JwtUserDetailsService
+import com.karbal.tutortek.services.RoleService
 import com.karbal.tutortek.services.UserService
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.impl.DefaultClaims
@@ -28,7 +29,8 @@ class JwtAuthenticationController(
     val authenticationManager: AuthenticationManager,
     val jwtTokenUtil: JwtTokenUtil,
     val userDetailsService: JwtUserDetailsService,
-    val userService: UserService
+    val userService: UserService,
+    val roleService: RoleService
 ) {
 
     @PostMapping(SecurityConstants.LOGIN_ENDPOINT)
@@ -48,7 +50,12 @@ class JwtAuthenticationController(
         if(userCount > 0)
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USER_ALREADY_EXISTS)
 
-        return UserGetDTO(userDetailsService.save(userPostDTO))
+        val roleId = userPostDTO.role.ordinal + 1L
+        val role = roleService.getRole(roleId)
+        if(role.isEmpty)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.ROLE_NOT_FOUND)
+
+        return UserGetDTO(userDetailsService.save(userPostDTO, role.get()))
     }
 
     @GetMapping(SecurityConstants.REFRESH_ENDPOINT)

@@ -10,8 +10,9 @@ data class RoleEntity(
     var id: Long? = null,
 
     @Column(name = "name", nullable = false)
-    var name: String = "",
+    var name: String = ""
 
-    @ManyToMany(mappedBy = "roles")
+) {
+    @ManyToMany(mappedBy = "roles", cascade = [CascadeType.REMOVE])
     var users: MutableSet<User> = mutableSetOf()
-)
+}
