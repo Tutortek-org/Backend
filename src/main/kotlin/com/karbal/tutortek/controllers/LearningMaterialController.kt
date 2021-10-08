@@ -4,13 +4,13 @@ import com.karbal.tutortek.dto.learningMaterialDTO.LearningMaterialGetDTO
 import com.karbal.tutortek.dto.learningMaterialDTO.LearningMaterialPostDTO
 import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
+import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.TopicService
-import com.karbal.tutortek.constants.ApiErrorSlug
-import com.karbal.tutortek.security.Role
+import com.karbal.tutortek.utils.ApiErrorSlug
 import org.springframework.http.HttpStatus
-import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.util.*
 
 @RestController
 @RequestMapping("topics/{topicId}/meetings/{meetingId}/materials")
@@ -32,7 +32,7 @@ class LearningMaterialController(
         return meeting.learningMaterials.map { lm -> LearningMaterialGetDTO(lm) }
     }
 
-    @GetMapping("{materialId}")
+    @GetMapping("/{materialId}")
     fun getLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long): LearningMaterialGetDTO {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -49,7 +49,6 @@ class LearningMaterialController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun addLearningMaterial(@PathVariable topicId: Long,
                             @PathVariable meetingId: Long,
                             @RequestBody learningMaterialDTO: LearningMaterialPostDTO): LearningMaterialGetDTO {
@@ -66,9 +65,8 @@ class LearningMaterialController(
         return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(learningMaterial))
     }
 
-    @DeleteMapping("{materialId}")
+    @DeleteMapping("/{materialId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun deleteLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long) {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -83,8 +81,7 @@ class LearningMaterialController(
         learningMaterial.id?.let { learningMaterialService.deleteLearningMaterial(it) }
     }
 
-    @PutMapping("{materialId}")
-    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
+    @PutMapping("/{materialId}")
     fun updateLearningMaterial(@PathVariable topicId: Long,
                                @PathVariable meetingId: Long,
                                @PathVariable materialId: Long,

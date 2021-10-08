@@ -1,9 +1,10 @@
 package com.karbal.tutortek.dto.userDTO
 
-import com.karbal.tutortek.security.Role
+import java.sql.Date
 
 data class UserPostDTO(
-    val email: String,
-    var password: String,
-    val role: Role
+    val firstName: String,
+    val lastName: String,
+    val rating: Float,
+    val birthDate: Date
 )

@@ -18,12 +18,12 @@ data class Topic(
     var meetings: MutableList<Meeting> = mutableListOf(),
 
     @ManyToOne
-    @JoinColumn(name = "user_profile_id")
-    var userProfile: UserProfile = UserProfile()
+    @JoinColumn(name = "user_id")
+    var user: User = User()
 ) {
     fun copy(topic: Topic) {
         name = topic.name
         meetings = topic.meetings
-        userProfile = topic.userProfile
+        user = topic.user
     }
 }

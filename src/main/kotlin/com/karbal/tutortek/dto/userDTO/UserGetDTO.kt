@@ -1,13 +1,20 @@
 package com.karbal.tutortek.dto.userDTO
 
 import com.karbal.tutortek.entities.User
+import java.sql.Date
 
 data class UserGetDTO(
     val id: Long?,
-    val email: String
-) {
+    val firstName: String,
+    val lastName: String,
+    val rating: Float,
+    val birthDate: Date
+){
     constructor(user: User) : this(
         user.id,
-        user.email
+        user.firstName,
+        user.lastName,
+        user.rating,
+        user.birthDate
     )
 }
