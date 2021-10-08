@@ -29,12 +29,12 @@ data class UserProfile(
     var payments: MutableList<Payment> = mutableListOf(),
 
     @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.REMOVE])
-    var topics: MutableList<Topic> = mutableListOf(),
-
+    var topics: MutableList<Topic> = mutableListOf()
+){
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     var user: User = User()
-){
+
     constructor(userProfilePostDTO: UserProfilePostDTO) : this(
         null,
         userProfilePostDTO.firstName,
