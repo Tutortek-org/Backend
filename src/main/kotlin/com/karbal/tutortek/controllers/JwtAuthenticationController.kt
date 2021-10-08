@@ -64,7 +64,7 @@ class JwtAuthenticationController(
     @GetMapping(SecurityConstants.REFRESH_ENDPOINT)
     fun refreshToken(request: HttpServletRequest): JwtGetDTO {
         var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
-        if(claims == null) claims = parseClaimsFromHeader(request)
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
         val expectedMap = getMapFromIoJwtClaims(claims)
         val token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap["sub"].toString())
         return JwtGetDTO(token)
@@ -96,15 +96,6 @@ class JwtAuthenticationController(
             if(!authorities.contains(SimpleGrantedAuthority(Role.ADMIN_ANNOTATION)))
                 throw ResponseStatusException(HttpStatus.UNAUTHORIZED, ApiErrorSlug.ADMIN_GRANT_NOT_ALLOWED)
         }
-    }
-
-    private fun parseClaimsFromHeader(request: HttpServletRequest): DefaultClaims? {
-        val requestTokenHeader = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER)
-        if(requestTokenHeader != null && requestTokenHeader.startsWith(SecurityConstants.TOKEN_BEGINNING)) {
-            val jwtToken = requestTokenHeader.substring(SecurityConstants.TOKEN_BEGINNING.length)
-            return jwtTokenUtil.getAllClaimsFromToken(jwtToken) as DefaultClaims?
-        }
-        return null
     }
 
     private fun getMapFromIoJwtClaims(claims: DefaultClaims?): HashMap<String, Any> {
