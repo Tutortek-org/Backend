@@ -5,7 +5,7 @@ import com.karbal.tutortek.security.Role
 import javax.persistence.*
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = [Index(name = "email_index", columnList = "email", unique = true)])
 data class User(
     @Id
     @Column(name = "id", nullable = false)
