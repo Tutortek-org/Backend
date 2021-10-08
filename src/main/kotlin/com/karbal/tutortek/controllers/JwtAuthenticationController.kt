@@ -31,9 +31,6 @@ class JwtAuthenticationController(
     val userService: UserService
 ) {
 
-    @Value("\${jwt.secret}")
-    private val secret: String = ""
-
     @PostMapping(SecurityConstants.LOGIN_ENDPOINT)
     fun createAuthenticationToken(@RequestBody authenticationRequest: JwtPostDTO): JwtGetDTO {
         authenticate(authenticationRequest.email, authenticationRequest.password)
