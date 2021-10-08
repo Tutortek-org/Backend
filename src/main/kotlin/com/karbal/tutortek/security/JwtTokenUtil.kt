@@ -4,12 +4,14 @@ import com.karbal.tutortek.constants.SecurityConstants
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
 import java.io.Serializable
 import java.util.*
 import java.util.function.Function
+import javax.servlet.http.HttpServletRequest
 import kotlin.collections.HashMap
 
 @Component
@@ -52,5 +54,14 @@ class JwtTokenUtil : Serializable {
     fun validateToken(token: String, userDetails: UserDetails): Boolean {
         val username = getUsernameFromToken(token)
         return username == userDetails.username && !isTokenExpired(token)
+    }
+
+    fun parseClaimsFromRequest(request: HttpServletRequest): DefaultClaims? {
+        val requestTokenHeader = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER)
+        if(requestTokenHeader != null && requestTokenHeader.startsWith(SecurityConstants.TOKEN_BEGINNING)) {
+            val jwtToken = requestTokenHeader.substring(SecurityConstants.TOKEN_BEGINNING.length)
+            return getAllClaimsFromToken(jwtToken) as DefaultClaims?
+        }
+        return null
     }
 }

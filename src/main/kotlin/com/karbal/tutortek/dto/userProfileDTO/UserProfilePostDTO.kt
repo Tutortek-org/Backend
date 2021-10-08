@@ -6,7 +6,5 @@ data class UserProfilePostDTO(
     val firstName: String,
     val lastName: String,
     val rating: Float,
-    val birthDate: Date,
-    val email: String,
-    val password: String
+    val birthDate: Date
 )

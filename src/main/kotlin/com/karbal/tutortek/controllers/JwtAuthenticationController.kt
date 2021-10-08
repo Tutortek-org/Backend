@@ -7,7 +7,9 @@ import com.karbal.tutortek.dto.jwtDTO.JwtPostDTO
 import com.karbal.tutortek.dto.roleDTO.RolePostDTO
 import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
+import com.karbal.tutortek.entities.RoleEntity
 import com.karbal.tutortek.security.JwtTokenUtil
+import com.karbal.tutortek.security.Role
 import com.karbal.tutortek.services.JwtUserDetailsService
 import com.karbal.tutortek.services.RoleService
 import com.karbal.tutortek.services.UserService
@@ -17,6 +19,8 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.regex.Pattern
@@ -60,7 +64,7 @@ class JwtAuthenticationController(
     @GetMapping(SecurityConstants.REFRESH_ENDPOINT)
     fun refreshToken(request: HttpServletRequest): JwtGetDTO {
         var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
-        if(claims == null) claims = parseClaimsFromHeader(request)
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
         val expectedMap = getMapFromIoJwtClaims(claims)
         val token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap["sub"].toString())
         return JwtGetDTO(token)
@@ -71,13 +75,14 @@ class JwtAuthenticationController(
         val roleFromDatabase = roleService.getRole(rolePostDTO.role + 1L)
         if(roleFromDatabase.isEmpty)
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.ROLE_NOT_FOUND)
+        val role = roleFromDatabase.get()
+        verifyAdminRoleGrant(role)
 
         val userFromDatabase = userService.getUserById(rolePostDTO.userId)
         if(userFromDatabase.isEmpty)
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USER_NOT_FOUND)
-
         val user = userFromDatabase.get()
-        val role = roleFromDatabase.get()
+
         user.roles.add(role)
         role.users.add(user)
 
@@ -85,13 +90,12 @@ class JwtAuthenticationController(
         return UserGetDTO(userService.saveUser(user))
     }
 
-    private fun parseClaimsFromHeader(request: HttpServletRequest): DefaultClaims? {
-        val requestTokenHeader = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER)
-        if(requestTokenHeader != null && requestTokenHeader.startsWith(SecurityConstants.TOKEN_BEGINNING)) {
-            val jwtToken = requestTokenHeader.substring(SecurityConstants.TOKEN_BEGINNING.length)
-            return jwtTokenUtil.getAllClaimsFromToken(jwtToken) as DefaultClaims?
+    private fun verifyAdminRoleGrant(roleEntity: RoleEntity) {
+        if(roleEntity.id == Role.ADMIN.ordinal + 1L) {
+            val authorities = SecurityContextHolder.getContext().authentication.authorities
+            if(!authorities.contains(SimpleGrantedAuthority(Role.ADMIN_ANNOTATION)))
+                throw ResponseStatusException(HttpStatus.UNAUTHORIZED, ApiErrorSlug.ADMIN_GRANT_NOT_ALLOWED)
         }
-        return null
     }
 
     private fun getMapFromIoJwtClaims(claims: DefaultClaims?): HashMap<String, Any> {

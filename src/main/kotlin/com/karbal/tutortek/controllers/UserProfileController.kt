@@ -5,20 +5,33 @@ import com.karbal.tutortek.dto.userProfileDTO.UserProfilePostDTO
 import com.karbal.tutortek.entities.UserProfile
 import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.security.JwtTokenUtil
+import com.karbal.tutortek.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.sql.Date
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("profiles")
-class UserProfileController(val userProfileService: UserProfileService) {
+class UserProfileController(
+    val userProfileService: UserProfileService,
+    val userService: UserService,
+    val jwtTokenUtil: JwtTokenUtil
+) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun addUserProfile(@RequestBody userProfileDTO: UserProfilePostDTO): UserProfileGetDTO {
+    fun addUserProfile(@RequestBody userProfileDTO: UserProfilePostDTO,
+                       request: HttpServletRequest
+    ): UserProfileGetDTO {
         verifyDto(userProfileDTO)
         val userProfile = UserProfile(userProfileDTO)
+        val claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val email = claims?.get("sub").toString()
+        val user = userService.getUserByEmail(email)
+        userProfile.user = user
         return UserProfileGetDTO(userProfileService.saveUserProfile(userProfile))
     }
 

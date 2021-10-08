@@ -24,15 +24,16 @@ class UserProfileSeeder(
 
             val parsedDate = SimpleDateFormat("yyyy-mm-dd").parse("2000-02-03")
             val user = userService.getFirstUser()
-
-            userProfileService.saveUserProfile(UserProfile(
+            val userProfile = UserProfile(
                 null,
                 "Karolis",
                 "Balciunas",
                 Date(parsedDate.time),
-                5.0F,
-                user = user
-            ))
+                5.0F
+            )
+            userProfile.user = user
+
+            userProfileService.saveUserProfile(userProfile)
         }
     }
 }
