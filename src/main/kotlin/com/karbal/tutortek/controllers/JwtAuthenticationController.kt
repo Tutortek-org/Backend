@@ -66,9 +66,9 @@ class JwtAuthenticationController(
         return JwtGetDTO(token)
     }
 
-    @PostMapping("/assign")
+    @PutMapping("/assign")
     fun addRole(@RequestBody rolePostDTO: RolePostDTO): UserGetDTO {
-        val roleFromDatabase = roleService.getRole(rolePostDTO.roleId)
+        val roleFromDatabase = roleService.getRole(rolePostDTO.role + 1L)
         if(roleFromDatabase.isEmpty)
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.ROLE_NOT_FOUND)
 
@@ -78,14 +78,8 @@ class JwtAuthenticationController(
 
         val user = userFromDatabase.get()
         val role = roleFromDatabase.get()
-
-        val newRoles = user.roles.toMutableSet()
-        newRoles.add(role)
-        user.roles = newRoles
-
-        val newUsers = role.users.toMutableSet()
-        newUsers.add(user)
-        user.roles = newRoles
+        user.roles.add(role)
+        role.users.add(user)
 
         roleService.saveRole(role)
         return UserGetDTO(userService.saveUser(user))
