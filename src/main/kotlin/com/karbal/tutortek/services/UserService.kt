@@ -14,4 +14,6 @@ class UserService(val database: UserRepository) {
     fun saveUser(user: User) = database.save(user)
 
     fun getUserCountByEmail(email: String) = database.getUserCountByEmail(email)
+
+    fun getUserById(id: Long) = database.findById(id)
 }

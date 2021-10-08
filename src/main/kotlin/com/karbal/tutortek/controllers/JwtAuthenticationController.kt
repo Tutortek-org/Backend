@@ -4,14 +4,14 @@ import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.dto.jwtDTO.JwtGetDTO
 import com.karbal.tutortek.dto.jwtDTO.JwtPostDTO
+import com.karbal.tutortek.dto.roleDTO.RolePostDTO
 import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.JwtUserDetailsService
+import com.karbal.tutortek.services.RoleService
 import com.karbal.tutortek.services.UserService
-import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.impl.DefaultClaims
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
@@ -28,11 +28,9 @@ class JwtAuthenticationController(
     val authenticationManager: AuthenticationManager,
     val jwtTokenUtil: JwtTokenUtil,
     val userDetailsService: JwtUserDetailsService,
-    val userService: UserService
+    val userService: UserService,
+    val roleService: RoleService
 ) {
-
-    @Value("\${jwt.secret}")
-    private val secret: String = ""
 
     @PostMapping(SecurityConstants.LOGIN_ENDPOINT)
     fun createAuthenticationToken(@RequestBody authenticationRequest: JwtPostDTO): JwtGetDTO {
@@ -51,7 +49,12 @@ class JwtAuthenticationController(
         if(userCount > 0)
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USER_ALREADY_EXISTS)
 
-        return UserGetDTO(userDetailsService.save(userPostDTO))
+        val roleId = userPostDTO.role.ordinal + 1L
+        val role = roleService.getRole(roleId)
+        if(role.isEmpty)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.ROLE_NOT_FOUND)
+
+        return UserGetDTO(userDetailsService.save(userPostDTO, role.get()))
     }
 
     @GetMapping(SecurityConstants.REFRESH_ENDPOINT)
@@ -61,6 +64,31 @@ class JwtAuthenticationController(
         val expectedMap = getMapFromIoJwtClaims(claims)
         val token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap["sub"].toString())
         return JwtGetDTO(token)
+    }
+
+    @PostMapping("/assign")
+    fun addRole(@RequestBody rolePostDTO: RolePostDTO): UserGetDTO {
+        val roleFromDatabase = roleService.getRole(rolePostDTO.roleId)
+        if(roleFromDatabase.isEmpty)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.ROLE_NOT_FOUND)
+
+        val userFromDatabase = userService.getUserById(rolePostDTO.userId)
+        if(userFromDatabase.isEmpty)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USER_NOT_FOUND)
+
+        val user = userFromDatabase.get()
+        val role = roleFromDatabase.get()
+
+        val newRoles = user.roles.toMutableSet()
+        newRoles.add(role)
+        user.roles = newRoles
+
+        val newUsers = role.users.toMutableSet()
+        newUsers.add(user)
+        user.roles = newRoles
+
+        roleService.saveRole(role)
+        return UserGetDTO(userService.saveUser(user))
     }
 
     private fun parseClaimsFromHeader(request: HttpServletRequest): DefaultClaims? {

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 import java.sql.Date
 
 @Component
-@Order(4)
+@Order(5)
 class MeetingSeeder(
     private val meetingService: MeetingService,
     private val topicService: TopicService

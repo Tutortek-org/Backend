@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 @Component
-@Order(3)
+@Order(4)
 class TopicSeeder(
     private val topicService: TopicService,
     private val userProfileService: UserProfileService) : ApplicationRunner {

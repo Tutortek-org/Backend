@@ -12,7 +12,7 @@ import java.sql.Date
 import java.text.SimpleDateFormat
 
 @Component
-@Order(2)
+@Order(3)
 class UserProfileSeeder(
     private val userProfileService: UserProfileService,
     private val userService: UserService
