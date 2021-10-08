@@ -1,7 +1,7 @@
 package com.karbal.tutortek.entities
 
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
-import com.karbal.tutortek.security.Role
+import java.sql.Date
 import javax.persistence.*
 
 @Entity
@@ -13,23 +13,38 @@ data class User(
     @SequenceGenerator(name = "user_generator", sequenceName = "user_seq", allocationSize = 1)
     var id: Long? = null,
 
-    @Column(name = "email", nullable = false, unique = true)
-    var email: String = "",
+    @Column(name = "firstName", nullable = false)
+    var firstName: String = "",
 
-    @Column(name = "password", nullable = false)
-    var password: String = "",
+    @Column(name = "lastName", nullable = false)
+    var lastName: String = "",
 
-    @OneToOne(mappedBy = "user", cascade = [CascadeType.REMOVE])
-    var userProfile: UserProfile? = null
-) {
+    @Column(name = "birthDate", nullable = false)
+    var birthDate: Date = Date(System.currentTimeMillis()),
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE])
-    @JoinTable(name = "user_role", joinColumns = [JoinColumn(name = "user_id")], inverseJoinColumns = [JoinColumn(name = "role_id")])
-    var roles: MutableSet<RoleEntity> = mutableSetOf()
+    @Column(name = "rating", nullable = false)
+    var rating: Float = 0.0F,
 
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
+    var payments: MutableList<Payment> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
+    var topics: MutableList<Topic> = mutableListOf()
+){
     constructor(userPostDTO: UserPostDTO) : this(
         null,
-        userPostDTO.email,
-        userPostDTO.password
+        userPostDTO.firstName,
+        userPostDTO.lastName,
+        userPostDTO.birthDate,
+        userPostDTO.rating
     )
+
+    fun copy(user: User){
+        firstName = user.firstName
+        lastName = user.lastName
+        birthDate = user.birthDate
+        rating = user.rating
+        payments = user.payments
+        topics = user.topics
+    }
 }
