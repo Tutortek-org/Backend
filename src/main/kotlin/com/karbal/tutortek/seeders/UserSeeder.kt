@@ -11,7 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 
 @Component
-@Order(1)
+@Order(2)
 class UserSeeder(private val userService: UserService) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
