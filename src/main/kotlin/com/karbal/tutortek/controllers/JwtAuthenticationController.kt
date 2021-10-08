@@ -4,15 +4,14 @@ import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.dto.jwtDTO.JwtGetDTO
 import com.karbal.tutortek.dto.jwtDTO.JwtPostDTO
+import com.karbal.tutortek.dto.roleDTO.RolePostDTO
 import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.JwtUserDetailsService
 import com.karbal.tutortek.services.RoleService
 import com.karbal.tutortek.services.UserService
-import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.impl.DefaultClaims
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
@@ -65,6 +64,31 @@ class JwtAuthenticationController(
         val expectedMap = getMapFromIoJwtClaims(claims)
         val token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap["sub"].toString())
         return JwtGetDTO(token)
+    }
+
+    @PostMapping("/assign")
+    fun addRole(@RequestBody rolePostDTO: RolePostDTO): UserGetDTO {
+        val roleFromDatabase = roleService.getRole(rolePostDTO.roleId)
+        if(roleFromDatabase.isEmpty)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.ROLE_NOT_FOUND)
+
+        val userFromDatabase = userService.getUserById(rolePostDTO.userId)
+        if(userFromDatabase.isEmpty)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USER_NOT_FOUND)
+
+        val user = userFromDatabase.get()
+        val role = roleFromDatabase.get()
+
+        val newRoles = user.roles.toMutableSet()
+        newRoles.add(role)
+        user.roles = newRoles
+
+        val newUsers = role.users.toMutableSet()
+        newUsers.add(user)
+        user.roles = newRoles
+
+        roleService.saveRole(role)
+        return UserGetDTO(userService.saveUser(user))
     }
 
     private fun parseClaimsFromHeader(request: HttpServletRequest): DefaultClaims? {
