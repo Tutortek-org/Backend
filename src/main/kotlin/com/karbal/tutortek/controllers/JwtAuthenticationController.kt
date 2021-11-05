@@ -61,6 +61,9 @@ class JwtAuthenticationController(
         return UserGetDTO(userDetailsService.save(userPostDTO, role.get()))
     }
 
+    @PostMapping("autologin")
+    fun autoLogin(){}
+
     @GetMapping(SecurityConstants.REFRESH_ENDPOINT)
     fun refreshToken(request: HttpServletRequest): JwtGetDTO {
         var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
