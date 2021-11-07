@@ -1,7 +1,7 @@
 # Tutortek Backend
 ## Requirements
 * MySQL 8.0.23
-* Spring Boot 2
+* Spring Boot 2.5.4
 
 ## Setup
 In order for this to work on your local environment create a file in `src/main/resources` directory named

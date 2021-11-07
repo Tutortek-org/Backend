@@ -1,6 +1,7 @@
 package com.karbal.tutortek.security
 
 import com.karbal.tutortek.constants.SecurityConstants
+import com.karbal.tutortek.services.UserService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -15,7 +16,7 @@ import javax.servlet.http.HttpServletRequest
 import kotlin.collections.HashMap
 
 @Component
-class JwtTokenUtil : Serializable {
+class JwtTokenUtil(val userService: UserService) : Serializable {
 
     @Value("\${jwt.secret}")
     private val secret: String = ""
@@ -38,6 +39,8 @@ class JwtTokenUtil : Serializable {
 
     fun generateToken(userDetails: UserDetails): String {
         val claims = hashMapOf<String, Any>()
+        val user = userService.getUserByEmail(userDetails.username)
+        user.id?.let { claims.put("uid", it) }
         return doGenerateToken(claims, userDetails.username)
     }
 
