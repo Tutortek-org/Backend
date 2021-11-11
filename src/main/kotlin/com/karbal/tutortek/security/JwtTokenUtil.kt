@@ -46,13 +46,14 @@ class JwtTokenUtil(
 
         val user = userService.getUserByEmail(userDetails.username)
         user.id?.let { claims.put("uid", it) }
+        claims["roles"] = user.roles.map { role -> role.name }
 
         try {
             val profile = user.id?.let { userProfileService.getUserProfileByUserId(it) }
             profile?.id?.let { claims.put("pid", it) }
         }
         catch (e: Exception) {}
-        
+
         return doGenerateToken(claims, userDetails.username)
     }
 

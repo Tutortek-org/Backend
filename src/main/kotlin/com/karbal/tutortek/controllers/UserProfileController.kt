@@ -5,7 +5,9 @@ import com.karbal.tutortek.dto.userProfileDTO.UserProfilePostDTO
 import com.karbal.tutortek.entities.UserProfile
 import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.dto.userProfileDTO.UserProfilePutDTO
 import com.karbal.tutortek.security.JwtTokenUtil
+import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletRequest
 class UserProfileController(
     val userProfileService: UserProfileService,
     val userService: UserService,
+    val topicService: TopicService,
     val jwtTokenUtil: JwtTokenUtil
 ) {
 
@@ -26,13 +29,13 @@ class UserProfileController(
     fun addUserProfile(@RequestBody userProfileDTO: UserProfilePostDTO,
                        request: HttpServletRequest
     ): UserProfileGetDTO {
-        verifyDto(userProfileDTO)
+        verifyPostDto(userProfileDTO)
         val userProfile = UserProfile(userProfileDTO)
         val claims = jwtTokenUtil.parseClaimsFromRequest(request)
         val email = claims?.get("sub").toString()
         val user = userService.getUserByEmail(email)
         userProfile.user = user
-        return UserProfileGetDTO(userProfileService.saveUserProfile(userProfile))
+        return UserProfileGetDTO(userProfileService.saveUserProfile(userProfile), 0)
     }
 
     @DeleteMapping("{id}")
@@ -45,19 +48,24 @@ class UserProfileController(
     }
 
     @GetMapping
-    fun getAllUserProfiles() = userProfileService.getAllUserProfiles().map { up -> UserProfileGetDTO(up) }
+    fun getAllUserProfiles() = userProfileService.getAllUserProfiles().map { up ->
+        val topicCount = up.id?.let { topicService.getTopicCountBelongingToUser(it) }
+        if (topicCount != null) UserProfileGetDTO(up, topicCount)
+    }
 
     @GetMapping("{id}")
-    fun getUserProfile(@PathVariable id: Long): UserProfileGetDTO {
+    fun getUserProfile(@PathVariable id: Long): UserProfileGetDTO? {
         val userProfile = userProfileService.getUserProfile(id)
         if(userProfile.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
-        return UserProfileGetDTO(userProfile.get())
+        val userProfileInDatabase = userProfile.get()
+        val topicCount = userProfileInDatabase.id?.let { topicService.getTopicCountBelongingToUser(it) }
+        return topicCount?.let { UserProfileGetDTO(userProfileInDatabase, it) }
     }
 
     @PutMapping("{id}")
-    fun updateUserProfile(@PathVariable id: Long, @RequestBody userProfileDTO: UserProfilePostDTO): UserProfileGetDTO {
-        verifyDto(userProfileDTO)
+    fun updateUserProfile(@PathVariable id: Long, @RequestBody userProfileDTO: UserProfilePutDTO): UserProfileGetDTO? {
+        verifyPutDto(userProfileDTO)
         val userProfile = UserProfile(userProfileDTO)
         val userProfileInDatabase = userProfileService.getUserProfile(id)
 
@@ -66,10 +74,12 @@ class UserProfileController(
 
         val extractedUserProfile = userProfileInDatabase.get()
         extractedUserProfile.copy(userProfile)
-        return UserProfileGetDTO(userProfileService.saveUserProfile(extractedUserProfile))
+
+        val topicCount = extractedUserProfile.id?.let { topicService.getTopicCountBelongingToUser(it) }
+        return topicCount?.let { UserProfileGetDTO(userProfileService.saveUserProfile(extractedUserProfile), it) }
     }
 
-    fun verifyDto(userProfileDTO: UserProfilePostDTO) {
+    fun verifyPostDto(userProfileDTO: UserProfilePostDTO) {
         if(userProfileDTO.firstName.isEmpty())
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.FIRST_NAME_EMPTY)
 
@@ -78,8 +88,19 @@ class UserProfileController(
 
         if(userProfileDTO.birthDate.after(Date(System.currentTimeMillis())))
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.BIRTH_DATE_AFTER_TODAY)
+    }
 
-        if(userProfileDTO.rating < 0)
+    fun verifyPutDto(userProfilePutDTO: UserProfilePutDTO) {
+        if(userProfilePutDTO.firstName.isEmpty())
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.FIRST_NAME_EMPTY)
+
+        if(userProfilePutDTO.lastName.isEmpty())
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.LAST_NAME_EMPTY)
+
+        if(userProfilePutDTO.birthDate.after(Date(System.currentTimeMillis())))
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.BIRTH_DATE_AFTER_TODAY)
+
+        if(userProfilePutDTO.rating < 0)
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NEGATIVE_RATING)
     }
 }

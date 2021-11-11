@@ -29,7 +29,8 @@ class UserProfileSeeder(
                 "Karolis",
                 "Balciunas",
                 Date(parsedDate.time),
-                5.0F
+                5.0F,
+                "Testinis aprasas"
             )
             userProfile.user = user
 

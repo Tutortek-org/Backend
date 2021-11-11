@@ -1,6 +1,7 @@
 package com.karbal.tutortek.entities
 
 import com.karbal.tutortek.dto.userProfileDTO.UserProfilePostDTO
+import com.karbal.tutortek.dto.userProfileDTO.UserProfilePutDTO
 import java.sql.Date
 import javax.persistence.*
 
@@ -25,6 +26,9 @@ data class UserProfile(
     @Column(name = "rating", nullable = false)
     var rating: Float = 0.0F,
 
+    @Column(name = "description", nullable = false)
+    var description: String = "",
+
     @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.REMOVE])
     var payments: MutableList<Payment> = mutableListOf(),
 
@@ -39,8 +43,16 @@ data class UserProfile(
         null,
         userProfilePostDTO.firstName,
         userProfilePostDTO.lastName,
-        userProfilePostDTO.birthDate,
-        userProfilePostDTO.rating
+        userProfilePostDTO.birthDate
+    )
+
+    constructor(userProfilePutDTO: UserProfilePutDTO) : this(
+        null,
+        userProfilePutDTO.firstName,
+        userProfilePutDTO.lastName,
+        userProfilePutDTO.birthDate,
+        userProfilePutDTO.rating,
+        userProfilePutDTO.description
     )
 
     fun copy(userProfile: UserProfile){
@@ -48,8 +60,6 @@ data class UserProfile(
         lastName = userProfile.lastName
         birthDate = userProfile.birthDate
         rating = userProfile.rating
-        payments = userProfile.payments
-        topics = userProfile.topics
-        user = userProfile.user
+        description = userProfile.description
     }
 }
