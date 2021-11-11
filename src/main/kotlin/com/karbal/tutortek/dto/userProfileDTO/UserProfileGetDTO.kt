@@ -8,13 +8,15 @@ data class UserProfileGetDTO(
     val firstName: String,
     val lastName: String,
     val rating: Float,
-    val birthDate: Date
+    val birthDate: Date,
+    val description: String
 ){
     constructor(userProfile: UserProfile) : this(
         userProfile.id,
         userProfile.firstName,
         userProfile.lastName,
         userProfile.rating,
-        userProfile.birthDate
+        userProfile.birthDate,
+        userProfile.description
     )
 }
