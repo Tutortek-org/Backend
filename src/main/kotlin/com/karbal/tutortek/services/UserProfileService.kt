@@ -18,4 +18,6 @@ class UserProfileService(val database: UserProfileRepository) {
     fun getFirstUserProfile() = database.getFirstUserProfile()
 
     fun clearUserProfiles() = database.deleteAll()
+
+    fun getUserProfileByUserId(id: Long) = database.getUserProfileByUserId(id)
 }
