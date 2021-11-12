@@ -7,7 +7,6 @@ import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.dto.userProfileDTO.UserProfilePutDTO
 import com.karbal.tutortek.security.JwtTokenUtil
-import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -20,7 +19,6 @@ import javax.servlet.http.HttpServletRequest
 class UserProfileController(
     val userProfileService: UserProfileService,
     val userService: UserService,
-    val topicService: TopicService,
     val jwtTokenUtil: JwtTokenUtil
 ) {
 
@@ -48,19 +46,15 @@ class UserProfileController(
     }
 
     @GetMapping
-    fun getAllUserProfiles() = userProfileService.getAllUserProfiles().map { up ->
-        val topicCount = up.id?.let { topicService.getTopicCountBelongingToUser(it) }
-        if (topicCount != null) UserProfileGetDTO(up, topicCount)
-    }
+    fun getAllUserProfiles() = userProfileService.getAllUserProfiles().map { up -> UserProfileGetDTO(up, up.topics.size) }
 
     @GetMapping("{id}")
-    fun getUserProfile(@PathVariable id: Long): UserProfileGetDTO? {
+    fun getUserProfile(@PathVariable id: Long): UserProfileGetDTO {
         val userProfile = userProfileService.getUserProfile(id)
         if(userProfile.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
         val userProfileInDatabase = userProfile.get()
-        val topicCount = userProfileInDatabase.id?.let { topicService.getTopicCountBelongingToUser(it) }
-        return topicCount?.let { UserProfileGetDTO(userProfileInDatabase, it) }
+        return UserProfileGetDTO(userProfileInDatabase, userProfileInDatabase.topics.size)
     }
 
     @PutMapping("{id}")
@@ -75,8 +69,7 @@ class UserProfileController(
         val extractedUserProfile = userProfileInDatabase.get()
         extractedUserProfile.copy(userProfile)
 
-        val topicCount = extractedUserProfile.id?.let { topicService.getTopicCountBelongingToUser(it) }
-        return topicCount?.let { UserProfileGetDTO(userProfileService.saveUserProfile(extractedUserProfile), it) }
+        return UserProfileGetDTO(userProfileService.saveUserProfile(extractedUserProfile), extractedUserProfile.topics.size)
     }
 
     fun verifyPostDto(userProfileDTO: UserProfilePostDTO) {
