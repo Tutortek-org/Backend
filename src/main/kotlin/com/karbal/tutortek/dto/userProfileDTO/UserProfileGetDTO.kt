@@ -10,9 +10,9 @@ data class UserProfileGetDTO(
     val rating: Float,
     val birthDate: Date,
     val description: String,
-    val topicCount: Long
+    val topicCount: Int
 ){
-    constructor(userProfile: UserProfile, topicCount: Long) : this(
+    constructor(userProfile: UserProfile, topicCount: Int) : this(
         userProfile.id,
         userProfile.firstName,
         userProfile.lastName,

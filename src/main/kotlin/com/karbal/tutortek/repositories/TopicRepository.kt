@@ -13,7 +13,4 @@ interface TopicRepository : CrudRepository<Topic, Long> {
 
     @Query("SELECT * FROM topics LIMIT 1", nativeQuery = true)
     fun getFirstTopic(): Topic
-
-    @Query("SELECT COUNT(*) FROM topics WHERE user_profile_id = :id", nativeQuery = true)
-    fun getTopicCountBelongingToUser(@Param("id") id: Long): Long
 }

@@ -20,6 +20,4 @@ class TopicService(val database: TopicRepository) {
     fun getFirstTopic() = database.getFirstTopic()
 
     fun clearTopics() = database.deleteAll()
-
-    fun getTopicCountBelongingToUser(id: Long) = database.getTopicCountBelongingToUser(id)
 }
