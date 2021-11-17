@@ -73,7 +73,7 @@ class JwtAuthenticationController(
         return JwtGetDTO(token)
     }
 
-    @PutMapping("/assign")
+    @PutMapping("assign")
     fun addRole(@RequestBody rolePostDTO: RolePostDTO): UserGetDTO {
         val roleFromDatabase = roleService.getRole(rolePostDTO.role + 1L)
         if(roleFromDatabase.isEmpty)
@@ -91,6 +91,17 @@ class JwtAuthenticationController(
 
         roleService.saveRole(role)
         return UserGetDTO(userService.saveUser(user))
+    }
+
+    @DeleteMapping("delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteUser(request: HttpServletRequest) {
+        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val email = claims?.get("sub")?.toString()
+        val user = email?.let { userService.getUserByEmail(it) }
+        user?.id?.let { roleService.deleteRelatedRoles(it) }
+        user?.id?.let { userService.deleteUserById(it) }
     }
 
     private fun verifyAdminRoleGrant(roleEntity: RoleEntity) {
