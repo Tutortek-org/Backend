@@ -18,4 +18,6 @@ class UserService(val database: UserRepository) {
     fun getUserCountByEmail(email: String) = database.getUserCountByEmail(email)
 
     fun getUserById(id: Long) = database.findById(id)
+
+    fun deleteUserById(id: Long) = database.deleteById(id)
 }

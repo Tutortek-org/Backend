@@ -23,7 +23,7 @@ data class User(
     var userProfile: UserProfile? = null
 ) {
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE])
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = [JoinColumn(name = "user_id")], inverseJoinColumns = [JoinColumn(name = "role_id")])
     var roles: MutableSet<RoleEntity> = mutableSetOf()
 
