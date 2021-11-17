@@ -14,4 +14,9 @@ interface RoleRepository : CrudRepository<RoleEntity, Long> {
     @Transactional
     @Query("DELETE FROM user_role WHERE user_id = :user_id", nativeQuery = true)
     fun deleteRelatedRoles(@Param("user_id") id: Long)
+
+    @Modifying
+    @Transactional
+    @Query("TRUNCATE TABLE user_role", nativeQuery = true)
+    fun deleteAllRecordsFromUserRole()
 }

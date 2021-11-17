@@ -13,6 +13,6 @@ data class RoleEntity(
     var name: String = ""
 
 ) {
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "roles", cascade = [CascadeType.ALL])
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "roles")
     var users: MutableSet<User> = mutableSetOf()
 }

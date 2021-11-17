@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component
 class RoleSeeder(private val roleService: RoleService) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         if(args!!.sourceArgs.any { it == CommandLineArguments.RESEED || it == CommandLineArguments.DB_ROLES }) {
+            roleService.deleteAllRecordsFromUserRole()
             roleService.clearRoles()
             Role.values().forEach {
                 val id = it.ordinal + 1L
