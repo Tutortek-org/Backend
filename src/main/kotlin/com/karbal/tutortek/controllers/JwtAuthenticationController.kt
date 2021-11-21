@@ -7,7 +7,9 @@ import com.karbal.tutortek.dto.jwtDTO.JwtPostDTO
 import com.karbal.tutortek.dto.roleDTO.RolePostDTO
 import com.karbal.tutortek.dto.userDTO.UserGetDTO
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
+import com.karbal.tutortek.dto.userDTO.UserPutDTO
 import com.karbal.tutortek.entities.RoleEntity
+import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
 import com.karbal.tutortek.services.JwtUserDetailsService
@@ -47,7 +49,7 @@ class JwtAuthenticationController(
     @PostMapping(SecurityConstants.REGISTER_ENDPOINT)
     @ResponseStatus(HttpStatus.CREATED)
     fun saveUser(@RequestBody userPostDTO: UserPostDTO): UserGetDTO {
-        verifyDto(userPostDTO)
+        verifyPostDto(userPostDTO)
 
         val userCount = userService.getUserCountByEmail(userPostDTO.email)
         if(userCount > 0)
@@ -96,12 +98,23 @@ class JwtAuthenticationController(
     @DeleteMapping("delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteUser(request: HttpServletRequest) {
+        val user = getUserFromDatabase(request)
+        user?.id?.let { roleService.deleteRelatedRoles(it) }
+        user?.id?.let { userService.deleteUserById(it) }
+    }
+
+    @PutMapping("password")
+    fun changePassword(@RequestBody userPutDTO: UserPutDTO, request: HttpServletRequest): UserGetDTO? {
+        verifyPutDto(userPutDTO)
+        val user = getUserFromDatabase(request)
+        return user?.let { userDetailsService.update(it, userPutDTO) }?.let { UserGetDTO(it) }
+    }
+
+    private fun getUserFromDatabase(request: HttpServletRequest): User? {
         var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
         if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
         val email = claims?.get("sub")?.toString()
-        val user = email?.let { userService.getUserByEmail(it) }
-        user?.id?.let { roleService.deleteRelatedRoles(it) }
-        user?.id?.let { userService.deleteUserById(it) }
+        return email?.let { userService.getUserByEmail(it) }
     }
 
     private fun verifyAdminRoleGrant(roleEntity: RoleEntity) {
@@ -130,7 +143,12 @@ class JwtAuthenticationController(
         }
     }
 
-    private fun verifyDto(userPostDTO: UserPostDTO) {
+    private fun verifyPutDto(userPutDTO: UserPutDTO) {
+        if(userPutDTO.password.length < 8)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.PASSWORD_TOO_SHORT)
+    }
+
+    private fun verifyPostDto(userPostDTO: UserPostDTO) {
         if(!validateEmail(userPostDTO.email))
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.EMAIL_NOT_VALID)
 
