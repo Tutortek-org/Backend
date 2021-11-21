@@ -2,6 +2,7 @@ package com.karbal.tutortek.services
 
 import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
+import com.karbal.tutortek.dto.userDTO.UserPutDTO
 import com.karbal.tutortek.entities.RoleEntity
 import com.karbal.tutortek.repositories.UserRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -30,6 +31,11 @@ class JwtUserDetailsService(
         userPostDTO.password = bcryptEncoder.encode(userPostDTO.password)
         val user = com.karbal.tutortek.entities.User(userPostDTO)
         user.roles.add(roleEntity)
+        return userRepository.save(user)
+    }
+
+    fun update(user: com.karbal.tutortek.entities.User, userPutDTO: UserPutDTO): com.karbal.tutortek.entities.User {
+        user.password = bcryptEncoder.encode(userPutDTO.password)
         return userRepository.save(user)
     }
 }
