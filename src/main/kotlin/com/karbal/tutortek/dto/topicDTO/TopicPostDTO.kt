@@ -1,6 +1,5 @@
 package com.karbal.tutortek.dto.topicDTO
 
 data class TopicPostDTO(
-    val name: String,
-    val userId: Long
+    val name: String
 )
