@@ -6,26 +6,32 @@ import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.constants.SecurityConstants
+import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
+import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import javax.annotation.security.RolesAllowed
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("topics")
 class TopicController(
     val topicService: TopicService,
-    val userProfileService: UserProfileService) {
+    val userProfileService: UserProfileService,
+    val jwtTokenUtil: JwtTokenUtil
+) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @RolesAllowed(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
-    fun addTopic(@RequestBody topicDTO: TopicPostDTO): TopicGetDTO {
+    fun addTopic(@RequestBody topicDTO: TopicPostDTO, request: HttpServletRequest): TopicGetDTO {
         verifyDto(topicDTO)
-        val topic = convertDtoToEntity(topicDTO)
+        val topic = convertDtoToEntity(topicDTO, request)
         return TopicGetDTO(topicService.saveTopic(topic))
     }
 
@@ -52,9 +58,9 @@ class TopicController(
 
     @PutMapping("{id}")
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
-    fun updateTopic(@PathVariable id: Long, @RequestBody topicDTO: TopicPostDTO): TopicGetDTO {
+    fun updateTopic(@PathVariable id: Long, @RequestBody topicDTO: TopicPostDTO, request: HttpServletRequest): TopicGetDTO {
         verifyDto(topicDTO)
-        val topic = convertDtoToEntity(topicDTO)
+        val topic = convertDtoToEntity(topicDTO, request)
         val topicInDatabase = topicService.getTopic(id)
 
         if(topicInDatabase.isEmpty)
@@ -65,10 +71,15 @@ class TopicController(
         return TopicGetDTO(topicService.saveTopic(extractedTopic))
     }
 
-    fun convertDtoToEntity(topicDTO: TopicPostDTO): Topic {
+    fun convertDtoToEntity(topicDTO: TopicPostDTO, request: HttpServletRequest): Topic {
         val topic = Topic()
         topic.name = topicDTO.name
-        val user = userProfileService.getUserProfile(topicDTO.userId)
+
+        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
+
+        val profileId = claims?.get("pid").toString().toLong()
+        val user = userProfileService.getUserProfile(profileId)
 
         if(user.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
