@@ -24,7 +24,8 @@ class UserSeeder(
             val user = User(
                 null,
                 "populated@email.com",
-                BCryptPasswordEncoder().encode("PopulatedPassword")
+                BCryptPasswordEncoder().encode("PopulatedPassword"),
+                false
             )
             val role = roleService.getRole(1)
             user.roles.add(role.get())

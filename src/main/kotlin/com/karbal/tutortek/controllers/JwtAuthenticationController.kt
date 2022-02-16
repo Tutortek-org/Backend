@@ -31,11 +31,11 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @CrossOrigin
 class JwtAuthenticationController(
-    val authenticationManager: AuthenticationManager,
-    val jwtTokenUtil: JwtTokenUtil,
-    val userDetailsService: JwtUserDetailsService,
-    val userService: UserService,
-    val roleService: RoleService
+    private val authenticationManager: AuthenticationManager,
+    private val jwtTokenUtil: JwtTokenUtil,
+    private val userDetailsService: JwtUserDetailsService,
+    private val userService: UserService,
+    private val roleService: RoleService
 ) {
 
     @PostMapping(SecurityConstants.LOGIN_ENDPOINT)

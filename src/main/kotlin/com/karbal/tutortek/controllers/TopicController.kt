@@ -71,7 +71,7 @@ class TopicController(
         return TopicGetDTO(topicService.saveTopic(extractedTopic))
     }
 
-    fun convertDtoToEntity(topicDTO: TopicPostDTO, request: HttpServletRequest): Topic {
+    private fun convertDtoToEntity(topicDTO: TopicPostDTO, request: HttpServletRequest): Topic {
         val topic = Topic()
         topic.name = topicDTO.name
 
@@ -88,7 +88,7 @@ class TopicController(
         return topic
     }
 
-    fun verifyDto(topicDTO: TopicPostDTO) {
+    private fun verifyDto(topicDTO: TopicPostDTO) {
         if(topicDTO.name.isEmpty())
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NAME_EMPTY)
     }
