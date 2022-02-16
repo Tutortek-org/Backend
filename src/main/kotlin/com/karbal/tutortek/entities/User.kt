@@ -19,6 +19,9 @@ data class User(
     @Column(name = "password", nullable = false)
     var password: String = "",
 
+    @Column(name = "isBanned", nullable = false)
+    var isBanned: Boolean = false,
+
     @OneToOne(mappedBy = "user", cascade = [CascadeType.REMOVE])
     var userProfile: UserProfile? = null
 ) {

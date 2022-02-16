@@ -38,6 +38,7 @@ class ApiErrorSlug {
         const val USER_ALREADY_EXISTS = "A user with that email is already registered"
         const val ROLE_NOT_FOUND = "Role not found with given id"
         const val ADMIN_GRANT_NOT_ALLOWED = "Only an admin can grant the role of an admin"
+        const val USER_IS_BANNED = "User is banned"
 
         // Common DTO validation errors
         const val NAME_EMPTY = "Name field is empty"
