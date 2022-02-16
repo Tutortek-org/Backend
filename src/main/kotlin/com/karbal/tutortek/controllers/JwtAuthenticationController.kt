@@ -17,6 +17,7 @@ import com.karbal.tutortek.services.RoleService
 import com.karbal.tutortek.services.UserService
 import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.annotation.Secured
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
@@ -102,6 +103,32 @@ class JwtAuthenticationController(
         user?.id?.let { roleService.deleteRelatedRoles(it) }
         user?.id?.let { userService.deleteUserById(it) }
     }
+
+    @PutMapping("users/{id}/ban")
+    @Secured(Role.ADMIN_ANNOTATION)
+    fun banUser(@PathVariable id: Long): UserGetDTO {
+        val user = userService.getUserById(id)
+        if(user.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+        val userFromDatabase = user.get()
+        userFromDatabase.isBanned = true
+        return UserGetDTO(userService.saveUser(userFromDatabase))
+    }
+
+    @PutMapping("users/{id}/unban")
+    @Secured(Role.ADMIN_ANNOTATION)
+    fun unbanUser(@PathVariable id: Long): UserGetDTO {
+        val user = userService.getUserById(id)
+        if(user.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+        val userFromDatabase = user.get()
+        userFromDatabase.isBanned = false
+        return UserGetDTO(userService.saveUser(userFromDatabase))
+    }
+
+    @GetMapping("users")
+    @Secured(Role.ADMIN_ANNOTATION)
+    fun getAllUsers() = userService.getAllUsers().map { u -> UserGetDTO(u) }
 
     @PutMapping("password")
     fun changePassword(@RequestBody userPutDTO: UserPutDTO, request: HttpServletRequest): UserGetDTO? {

@@ -24,7 +24,7 @@ class JwtUserDetailsService(
     override fun loadUserByUsername(email: String?): UserDetails {
         val user = email?.let { userRepository.findByEmail(it) }
             ?: throw UsernameNotFoundException(ApiErrorSlug.EMAIL_NOT_FOUND + email)
-        
+
         if(user.isBanned)
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USER_IS_BANNED)
 

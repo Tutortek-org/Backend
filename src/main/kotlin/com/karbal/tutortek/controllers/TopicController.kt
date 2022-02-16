@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @RequestMapping("topics")
 class TopicController(
-    val topicService: TopicService,
-    val userProfileService: UserProfileService,
-    val jwtTokenUtil: JwtTokenUtil
+    private val topicService: TopicService,
+    private val userProfileService: UserProfileService,
+    private val jwtTokenUtil: JwtTokenUtil
 ) {
 
     @PostMapping
