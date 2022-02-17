@@ -11,13 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 class TutortekApplication {
 	@Bean
 	fun passwordEncoder() = BCryptPasswordEncoder()
-
-	@Bean
-	fun corsConfigurer() = object : WebMvcConfigurer{
-		override fun addCorsMappings(registry: CorsRegistry) {
-			registry.addMapping("*").allowedOrigins("*")
-		}
-	}
 }
 
 fun main(args: Array<String>) {
