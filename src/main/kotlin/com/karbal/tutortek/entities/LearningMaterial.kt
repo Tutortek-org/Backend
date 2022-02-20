@@ -21,6 +21,9 @@ data class LearningMaterial(
     @Column(name = "link", nullable = false)
     var link: String = "",
 
+    @Column(name = "isApproved", nullable = false)
+    var isApproved: Boolean = false,
+
     @ManyToOne
     @JoinColumn(name = "meeting_id")
     var meeting: Meeting = Meeting()

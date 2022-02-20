@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository
 interface LearningMaterialRepository : CrudRepository<LearningMaterial, Long> {
     @Query("SELECT * FROM learning_materials", nativeQuery = true)
     fun getAllLearningMaterials(): List<LearningMaterial>
+
+    @Query("SELECT * FROM learning_materials WHERE is_approved = 0", nativeQuery = true)
+    fun getAllUnapproved(): List<LearningMaterial>
 }
