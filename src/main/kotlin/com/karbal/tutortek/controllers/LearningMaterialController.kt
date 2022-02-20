@@ -13,13 +13,12 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-@RequestMapping("topics/{topicId}/meetings/{meetingId}/materials")
 class LearningMaterialController(
     val learningMaterialService: LearningMaterialService,
     val topicService: TopicService
 ) {
 
-    @GetMapping
+    @GetMapping("topics/{topicId}/meetings/{meetingId}/materials")
     fun getAllLearningMaterials(@PathVariable topicId: Long, @PathVariable meetingId: Long): List<LearningMaterialGetDTO> {
         val topic = topicService.getTopic(topicId)
 
@@ -32,7 +31,7 @@ class LearningMaterialController(
         return meeting.learningMaterials.map { lm -> LearningMaterialGetDTO(lm) }
     }
 
-    @GetMapping("{materialId}")
+    @GetMapping("topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
     fun getLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long): LearningMaterialGetDTO {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -47,7 +46,11 @@ class LearningMaterialController(
         return LearningMaterialGetDTO(learningMaterial)
     }
 
-    @PostMapping
+    @GetMapping("materials/unapproved")
+    @Secured(Role.ADMIN_ANNOTATION)
+    fun getAllUnapproved() = learningMaterialService.getAllUnapproved().map { lm -> LearningMaterialGetDTO(lm) }
+
+    @PostMapping("topics/{topicId}/meetings/{meetingId}/materials")
     @ResponseStatus(HttpStatus.CREATED)
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun addLearningMaterial(@PathVariable topicId: Long,
@@ -66,7 +69,7 @@ class LearningMaterialController(
         return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(learningMaterial))
     }
 
-    @DeleteMapping("{materialId}")
+    @DeleteMapping("topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun deleteLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long) {
@@ -83,7 +86,7 @@ class LearningMaterialController(
         learningMaterial.id?.let { learningMaterialService.deleteLearningMaterial(it) }
     }
 
-    @PutMapping("{materialId}")
+    @PutMapping("topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun updateLearningMaterial(@PathVariable topicId: Long,
                                @PathVariable meetingId: Long,
@@ -104,6 +107,18 @@ class LearningMaterialController(
         learningMaterialFromDto.id = materialId
         learningMaterialFromDto.meeting = meeting
         return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(learningMaterialFromDto))
+    }
+
+    @PutMapping("materials/{id}/approve")
+    @Secured(Role.ADMIN_ANNOTATION)
+    fun approveLearningMaterial(@PathVariable id: Long): LearningMaterialGetDTO {
+        val material = learningMaterialService.getLearningMaterial(id)
+        if(material.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MATERIAL_NOT_FOUND)
+
+        val extractedMaterial = material.get()
+        extractedMaterial.isApproved = true
+        return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(extractedMaterial))
     }
 
     fun verifyDto(learningMaterialDTO: LearningMaterialPostDTO) {

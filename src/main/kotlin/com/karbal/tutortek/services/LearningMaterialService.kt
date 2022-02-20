@@ -18,4 +18,6 @@ class LearningMaterialService(val database: LearningMaterialRepository) {
     fun getLearningMaterial(id: Long) = database.findById(id)
 
     fun clearLearningMaterials() = database.deleteAll()
+
+    fun getAllUnapproved() = database.getAllUnapproved()
 }

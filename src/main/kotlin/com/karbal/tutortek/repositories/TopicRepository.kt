@@ -13,4 +13,7 @@ interface TopicRepository : CrudRepository<Topic, Long> {
 
     @Query("SELECT * FROM topics LIMIT 1", nativeQuery = true)
     fun getFirstTopic(): Topic
+
+    @Query("SELECT * FROM topics WHERE is_approved = 0", nativeQuery = true)
+    fun getAllUnapproved(): List<Topic>
 }

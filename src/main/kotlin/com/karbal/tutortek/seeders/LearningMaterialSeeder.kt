@@ -25,6 +25,7 @@ class LearningMaterialSeeder(
                 "Populated material",
                 "Populated description",
                 "populated.com/link",
+                true,
                 meeting
             ))
         }

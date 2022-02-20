@@ -19,7 +19,7 @@ class TopicSeeder(
         if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
             topicService.clearTopics()
             val user = userProfileService.getFirstUserProfile()
-            topicService.saveTopic(Topic(null, "Populated topic", userProfile = user))
+            topicService.saveTopic(Topic(null, "Populated topic", true, userProfile = user))
         }
     }
 }

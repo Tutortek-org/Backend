@@ -48,6 +48,10 @@ class TopicController(
     @GetMapping
     fun getAllTopics() = topicService.getAllTopics().map { t -> TopicGetDTO(t) }
 
+    @GetMapping("unapproved")
+    @Secured(Role.ADMIN_ANNOTATION)
+    fun getAllUnapproved() = topicService.getAllUnapproved().map { t -> TopicGetDTO(t) }
+
     @GetMapping("{id}")
     fun getTopic(@PathVariable id: Long): TopicGetDTO {
         val topic = topicService.getTopic(id)
@@ -68,6 +72,18 @@ class TopicController(
 
         val extractedTopic = topicInDatabase.get()
         extractedTopic.copy(topic)
+        return TopicGetDTO(topicService.saveTopic(extractedTopic))
+    }
+
+    @PutMapping("{id}/approve")
+    @Secured(Role.ADMIN_ANNOTATION)
+    fun approveTopic(@PathVariable id: Long): TopicGetDTO {
+        val topicInDatabase = topicService.getTopic(id)
+        if(topicInDatabase.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
+
+        val extractedTopic = topicInDatabase.get()
+        extractedTopic.isApproved = true
         return TopicGetDTO(topicService.saveTopic(extractedTopic))
     }
 
