@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import javax.annotation.security.RolesAllowed
 
 @RestController
 class LearningMaterialController(
@@ -119,6 +120,16 @@ class LearningMaterialController(
         val extractedMaterial = material.get()
         extractedMaterial.isApproved = true
         return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(extractedMaterial))
+    }
+
+    @DeleteMapping("materials/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RolesAllowed(Role.ADMIN_ANNOTATION)
+    fun adminReject(@PathVariable id: Long) {
+        val material = learningMaterialService.getLearningMaterial(id)
+        if(material.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MATERIAL_NOT_FOUND)
+        learningMaterialService.deleteLearningMaterial(id)
     }
 
     fun verifyDto(learningMaterialDTO: LearningMaterialPostDTO) {
