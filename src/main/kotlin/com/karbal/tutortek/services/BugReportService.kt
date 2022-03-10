@@ -12,4 +12,6 @@ class BugReportService(val database: BugReportRepository) {
     fun saveBugReport(bugReport: BugReport) = database.save(bugReport)
 
     fun deleteBugReport(id: Long) = database.deleteById(id)
+
+    fun getBugReport(id: Long) = database.findById(id)
 }
