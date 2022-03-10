@@ -23,7 +23,10 @@ data class User(
     var isBanned: Boolean = false,
 
     @OneToOne(mappedBy = "user", cascade = [CascadeType.REMOVE])
-    var userProfile: UserProfile? = null
+    var userProfile: UserProfile? = null,
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
+    var bugReports: MutableList<BugReport> = mutableListOf()
 ) {
 
     @ManyToMany(fetch = FetchType.EAGER)
