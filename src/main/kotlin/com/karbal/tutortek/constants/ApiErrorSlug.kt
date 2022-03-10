@@ -9,6 +9,7 @@ class ApiErrorSlug {
         const val PAYMENT_NOT_FOUND = "Payment not found"
         const val MEETING_NOT_FOUND = "Meeting not found"
         const val MATERIAL_NOT_FOUND = "Learning material not found"
+        const val BUG_REPORT_NOT_FOUND = "Bug report not found"
 
         // UserProfile DTO validation errors
         const val FIRST_NAME_EMPTY = "First name field is empty"
