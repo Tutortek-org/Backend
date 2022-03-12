@@ -8,8 +8,10 @@ import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.dto.userProfileDTO.UserProfilePutDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.UserService
+import com.karbal.tutortek.utils.S3Utils
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.sql.Date
 import javax.servlet.http.HttpServletRequest
@@ -36,9 +38,12 @@ class UserProfileController(
         return UserProfileGetDTO(userProfileService.saveUserProfile(userProfile), 0)
     }
 
+    @PutMapping("/picture")
+    fun addProfilePicture(@RequestParam photo: MultipartFile) = S3Utils.uploadFile("pfp_${photo.originalFilename}", photo.inputStream)
+
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteUserProfile(@PathVariable id: Long){
+    fun deleteUserProfile(@PathVariable id: Long) {
         val userProfile = userProfileService.getUserProfile(id)
         if(userProfile.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
