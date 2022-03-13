@@ -1,5 +1,6 @@
 package com.karbal.tutortek.controllers
 
+import com.amazonaws.util.IOUtils
 import com.karbal.tutortek.dto.userProfileDTO.UserProfileGetDTO
 import com.karbal.tutortek.dto.userProfileDTO.UserProfilePostDTO
 import com.karbal.tutortek.entities.UserProfile
@@ -10,6 +11,7 @@ import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.UserService
 import com.karbal.tutortek.utils.S3Utils
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
@@ -39,7 +41,19 @@ class UserProfileController(
     }
 
     @PutMapping("/picture")
-    fun addProfilePicture(@RequestParam photo: MultipartFile) = S3Utils.uploadFile("pfp_${photo.originalFilename}", photo.inputStream)
+    fun addProfilePicture(@RequestParam photo: MultipartFile, request: HttpServletRequest) {
+        val claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val email = claims?.get("sub").toString()
+        S3Utils.uploadFile("pfp_$email", photo.inputStream)
+    }
+
+    @GetMapping("/picture", produces = [MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE])
+    fun getProfilePicture(request: HttpServletRequest): ByteArray? {
+        val claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val email = claims?.get("sub").toString()
+        val file = S3Utils.downloadFile("pfp_$email")
+        return IOUtils.toByteArray(file)
+    }
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

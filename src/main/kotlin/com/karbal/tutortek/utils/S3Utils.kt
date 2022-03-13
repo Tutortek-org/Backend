@@ -2,6 +2,7 @@ package com.karbal.tutortek.utils
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.*
 import org.springframework.beans.factory.annotation.Value
@@ -33,13 +34,21 @@ class S3Utils {
         private var AWS_SECRET_ACCESS_KEY = ""
 
         fun uploadFile(fileName: String, inputStream: InputStream) {
+            val request = PutObjectRequest(BUCKET, fileName, inputStream, ObjectMetadata())
+            getS3Client()?.putObject(request)
+        }
+
+        fun downloadFile(objectKey: String): InputStream? {
+            val request = GetObjectRequest(BUCKET, objectKey)
+            val result = getS3Client()?.getObject(request)
+            return result?.objectContent?.delegateStream
+        }
+
+        private fun getS3Client(): AmazonS3? {
             val builder = AmazonS3ClientBuilder.standard()
             builder.region = Region.EU_CENTRAL_1.toString()
             builder.credentials = AWSStaticCredentialsProvider(BasicAWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY))
-            val client = builder.build()
-            val request = PutObjectRequest(BUCKET, fileName, inputStream, ObjectMetadata())
-            request.cannedAcl = CannedAccessControlList.PublicReadWrite
-            client.putObject(request)
+            return builder.build()
         }
     }
 }
