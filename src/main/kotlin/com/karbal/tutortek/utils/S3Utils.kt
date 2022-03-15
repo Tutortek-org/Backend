@@ -5,8 +5,11 @@ import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.*
+import com.karbal.tutortek.constants.ApiErrorSlug
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
+import org.springframework.web.server.ResponseStatusException
 import software.amazon.awssdk.regions.Region
 import java.io.InputStream
 
@@ -39,9 +42,14 @@ class S3Utils {
         }
 
         fun downloadFile(objectKey: String): InputStream? {
-            val request = GetObjectRequest(BUCKET, objectKey)
-            val result = getS3Client()?.getObject(request)
-            return result?.objectContent?.delegateStream
+            try {
+                val request = GetObjectRequest(BUCKET, objectKey)
+                val result = getS3Client()?.getObject(request)
+                return result?.objectContent?.delegateStream
+            }
+            catch (e: AmazonS3Exception) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NO_PHOTO_EXISTS)
+            }
         }
 
         private fun getS3Client(): AmazonS3? {
