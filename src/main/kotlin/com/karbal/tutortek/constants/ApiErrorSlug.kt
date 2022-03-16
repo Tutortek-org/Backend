@@ -46,4 +46,5 @@ object ApiErrorSlug {
 
     // AWS errors
     const val NO_PHOTO_EXISTS = "The user does not have a photo uploaded"
+    const val EMPTY_DEVICE_TOKEN = "A device token must be provided"
 }
