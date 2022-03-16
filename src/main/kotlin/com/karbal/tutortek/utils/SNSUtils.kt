@@ -6,9 +6,13 @@ import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.AmazonSNSClientBuilder
 import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest
 import com.amazonaws.services.sns.model.CreatePlatformEndpointResult
+import com.amazonaws.services.sns.model.Endpoint
 import com.amazonaws.services.sns.model.GetEndpointAttributesRequest
+import com.amazonaws.services.sns.model.ListEndpointsByPlatformApplicationRequest
 import com.amazonaws.services.sns.model.NotFoundException
+import com.amazonaws.services.sns.model.PublishRequest
 import com.amazonaws.services.sns.model.SetEndpointAttributesRequest
+import com.karbal.tutortek.dto.notificationDTO.NotificationPostDTO
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import software.amazon.awssdk.regions.Region
@@ -36,11 +40,40 @@ class SNSUtils {
         private var AWS_ACCESS_KEY_ID = ""
         private var AWS_SECRET_ACCESS_KEY = ""
 
+        fun sendNotifications(notificationPostDTO: NotificationPostDTO) {
+            val client = getSNSClient()
+            val endpoints = getEndpointList(client)
+            endpoints.forEach {
+                val isEnabled = it.attributes["Enabled"].toBoolean()
+                if(isEnabled) {
+                    val request = PublishRequest()
+                        .withTargetArn(it.endpointArn)
+                        .withSubject(notificationPostDTO.title)
+                        .withMessage(notificationPostDTO.content)
+                    client?.publish(request)
+                }
+            }
+        }
+
         fun createEndpoint(token: String): String? {
             val client = getSNSClient()
             var result = createEndpointInner(token, client)
             result = updateEndpoint(result, token, client)
             return result?.endpointArn
+        }
+
+        private fun getEndpointList(client: AmazonSNS?): MutableList<Endpoint> {
+            val endpoints = mutableListOf<Endpoint>()
+            var nextToken = ""
+            do {
+                val request = ListEndpointsByPlatformApplicationRequest()
+                    .withPlatformApplicationArn(ARN)
+                if(nextToken.isNotEmpty()) request.nextToken = nextToken
+                val result = client?.listEndpointsByPlatformApplication(request)
+                result?.endpoints?.let { endpoints.addAll(it) }
+                nextToken = result?.nextToken.toString()
+            } while (nextToken.isNotEmpty() && nextToken != "null")
+            return endpoints
         }
 
         private fun createEndpointInner(token: String, client: AmazonSNS?): CreatePlatformEndpointResult? {

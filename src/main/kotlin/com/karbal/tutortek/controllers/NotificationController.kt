@@ -2,6 +2,7 @@ package com.karbal.tutortek.controllers
 
 import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.dto.notificationDTO.NotificationGetDTO
+import com.karbal.tutortek.dto.notificationDTO.EndpointPostDTO
 import com.karbal.tutortek.dto.notificationDTO.NotificationPostDTO
 import com.karbal.tutortek.utils.SNSUtils
 import org.springframework.http.HttpStatus
@@ -18,14 +19,28 @@ class NotificationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun createNotificationEndpoint(@RequestBody notificationPostDTO: NotificationPostDTO): NotificationGetDTO {
-        verifyDto(notificationPostDTO)
-        val endpointArn = SNSUtils.createEndpoint(notificationPostDTO.deviceToken)
+    fun createNotificationEndpoint(@RequestBody endpointPostDTO: EndpointPostDTO): NotificationGetDTO {
+        verifyEndpointDto(endpointPostDTO)
+        val endpointArn = SNSUtils.createEndpoint(endpointPostDTO.deviceToken)
         return NotificationGetDTO(endpointArn)
     }
 
-    private fun verifyDto(notificationPostDTO: NotificationPostDTO) {
-        if(notificationPostDTO.deviceToken.isBlank())
+    @PostMapping("send")
+    fun sendNotifications(@RequestBody notificationPostDTO: NotificationPostDTO) {
+        verifyNotificationPostDto(notificationPostDTO)
+        SNSUtils.sendNotifications(notificationPostDTO)
+    }
+
+    private fun verifyEndpointDto(endpointPostDTO: EndpointPostDTO) {
+        if(endpointPostDTO.deviceToken.isBlank())
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.EMPTY_DEVICE_TOKEN)
+    }
+
+    private fun verifyNotificationPostDto(notificationPostDTO: NotificationPostDTO) {
+        if(notificationPostDTO.title.isBlank())
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.BLANK_NOTIFICATION_TITLE)
+
+        if(notificationPostDTO.content.isBlank())
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.BLANK_NOTIFICATION_CONTENT)
     }
 }
