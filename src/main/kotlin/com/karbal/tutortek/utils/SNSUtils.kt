@@ -42,7 +42,21 @@ class SNSUtils {
 
         fun sendNotifications(notificationPostDTO: NotificationPostDTO) {
             val client = getSNSClient()
-            val endpoints = getEndpointList(client)
+            processEndpoints(notificationPostDTO, client)
+        }
+
+        fun createEndpoint(token: String): String? {
+            val client = getSNSClient()
+            var result = createEndpointInner(token, client)
+            result = updateEndpoint(result, token, client)
+            return result?.endpointArn
+        }
+
+        private fun publishMessageToEndpoints(
+            notificationPostDTO: NotificationPostDTO,
+            endpoints: List<Endpoint>,
+            client: AmazonSNS?) {
+            
             endpoints.forEach {
                 val isEnabled = it.attributes["Enabled"].toBoolean()
                 if(isEnabled) {
@@ -55,25 +69,16 @@ class SNSUtils {
             }
         }
 
-        fun createEndpoint(token: String): String? {
-            val client = getSNSClient()
-            var result = createEndpointInner(token, client)
-            result = updateEndpoint(result, token, client)
-            return result?.endpointArn
-        }
-
-        private fun getEndpointList(client: AmazonSNS?): MutableList<Endpoint> {
-            val endpoints = mutableListOf<Endpoint>()
+        private fun processEndpoints(notificationPostDTO: NotificationPostDTO, client: AmazonSNS?) {
             var nextToken = ""
             do {
                 val request = ListEndpointsByPlatformApplicationRequest()
                     .withPlatformApplicationArn(ARN)
                 if(nextToken.isNotEmpty()) request.nextToken = nextToken
                 val result = client?.listEndpointsByPlatformApplication(request)
-                result?.endpoints?.let { endpoints.addAll(it) }
+                result?.endpoints?.let { publishMessageToEndpoints(notificationPostDTO, it, client) }
                 nextToken = result?.nextToken.toString()
             } while (nextToken.isNotEmpty() && nextToken != "null")
-            return endpoints
         }
 
         private fun createEndpointInner(token: String, client: AmazonSNS?): CreatePlatformEndpointResult? {
@@ -90,7 +95,7 @@ class SNSUtils {
                 val getPlatformEndpointRequest = GetEndpointAttributesRequest().withEndpointArn(result?.endpointArn)
                 val getResult = client?.getEndpointAttributes(getPlatformEndpointRequest)
                 isUpdateNeeded = !getResult?.attributes?.get("Token").equals(token)
-                        || !getResult?.attributes?.get("Enabled")?.lowercase().equals("true")
+                        || !getResult?.attributes?.get("Enabled")?.toBoolean()!!
             }
             catch (e: NotFoundException) {
                 toReturn = createEndpointInner(token, client)
