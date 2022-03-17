@@ -46,4 +46,7 @@ object ApiErrorSlug {
 
     // AWS errors
     const val NO_PHOTO_EXISTS = "The user does not have a photo uploaded"
+    const val EMPTY_DEVICE_TOKEN = "A device token must be provided"
+    const val BLANK_NOTIFICATION_TITLE = "Notification title cannot be blank"
+    const val BLANK_NOTIFICATION_CONTENT = "Notification content cannot be blank"
 }
