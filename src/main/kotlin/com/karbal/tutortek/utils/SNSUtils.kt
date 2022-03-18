@@ -4,14 +4,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.AmazonSNSClientBuilder
-import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest
-import com.amazonaws.services.sns.model.CreatePlatformEndpointResult
-import com.amazonaws.services.sns.model.Endpoint
-import com.amazonaws.services.sns.model.GetEndpointAttributesRequest
-import com.amazonaws.services.sns.model.ListEndpointsByPlatformApplicationRequest
-import com.amazonaws.services.sns.model.NotFoundException
-import com.amazonaws.services.sns.model.PublishRequest
-import com.amazonaws.services.sns.model.SetEndpointAttributesRequest
+import com.amazonaws.services.sns.model.*
 import com.karbal.tutortek.dto.notificationDTO.NotificationPostDTO
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -63,8 +56,13 @@ class SNSUtils {
                     val request = PublishRequest()
                         .withTargetArn(it.endpointArn)
                         .withSubject(notificationPostDTO.title)
-                        .withMessage(notificationPostDTO.content)
+                        .withMessage(notificationPostDTO.toString())
                     client?.publish(request)
+                }
+                else {
+                    val request = DeleteEndpointRequest()
+                        .withEndpointArn(it.endpointArn)
+                    client?.deleteEndpoint(request)
                 }
             }
         }
