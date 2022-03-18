@@ -63,7 +63,7 @@ class SNSUtils {
                     val request = PublishRequest()
                         .withTargetArn(it.endpointArn)
                         .withSubject(notificationPostDTO.title)
-                        .withMessage(notificationPostDTO.content)
+                        .withMessage(notificationPostDTO.toString())
                     client?.publish(request)
                 }
             }
