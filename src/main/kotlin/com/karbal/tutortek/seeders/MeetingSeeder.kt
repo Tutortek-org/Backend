@@ -8,6 +8,7 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
+import java.math.BigDecimal
 import java.sql.Date
 
 @Component
@@ -29,6 +30,7 @@ class MeetingSeeder(
                 5,
                 "Populated address",
                 "Populated description",
+                BigDecimal(7.0),
                 topic = topic
             ))
         }

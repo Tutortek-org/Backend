@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.math.BigDecimal
 import java.sql.Date
 
 @RestController
@@ -103,5 +104,8 @@ class MeetingController(
 
         if(meetingDTO.date.before(Date(System.currentTimeMillis())))
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.DATE_BEFORE_TODAY)
+
+        if(meetingDTO.price < BigDecimal.ZERO)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NEGATIVE_PRICE)
     }
 }

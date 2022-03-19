@@ -1,6 +1,7 @@
 package com.karbal.tutortek.entities
 
 import com.karbal.tutortek.dto.meetingDTO.MeetingPostDTO
+import java.math.BigDecimal
 import java.sql.Date
 import javax.persistence.*
 
@@ -28,6 +29,9 @@ data class Meeting(
     @Column(name = "description", nullable = false)
     var description: String = "",
 
+    @Column(name = "price", nullable = false)
+    var price: BigDecimal = BigDecimal(0.0),
+
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.REMOVE])
     var payments: MutableList<Payment> = mutableListOf(),
 
@@ -44,6 +48,7 @@ data class Meeting(
         meetingPostDTO.date,
         meetingPostDTO.maxAttendants,
         meetingPostDTO.address,
-        meetingPostDTO.description
+        meetingPostDTO.description,
+        meetingPostDTO.price
     )
 }
