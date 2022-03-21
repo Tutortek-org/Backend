@@ -26,7 +26,6 @@ class PaymentSeeder(
             val meeting = meetingService.getFirstMeeting()
             paymentService.savePayment(Payment(
                 null,
-                price = BigDecimal(12.34),
                 userProfile = user,
                 meeting = meeting
             ))

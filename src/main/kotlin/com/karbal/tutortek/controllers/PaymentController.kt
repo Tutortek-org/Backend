@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.math.BigDecimal
 
 @RestController
 @RequestMapping("payments")
@@ -24,7 +23,6 @@ class PaymentController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addPayment(@RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
-        verifyDto(paymentDTO)
         val payment = convertDtoToEntity(paymentDTO)
         return PaymentGetDTO(paymentService.savePayment(payment))
     }
@@ -52,7 +50,6 @@ class PaymentController(
 
     @PutMapping("{id}")
     fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
-        verifyDto(paymentDTO)
         val payment = convertDtoToEntity(paymentDTO)
         val paymentInDatabase = paymentService.getPayment(id)
 
@@ -65,24 +62,19 @@ class PaymentController(
     }
 
     fun convertDtoToEntity(paymentDTO: PaymentPostDTO): Payment {
-        val payment = Payment()
-        payment.price = paymentDTO.price
 
         val user = userProfileService.getUserProfile(paymentDTO.userId)
         if(user.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
 
-        val meeting = meetingService.getMeeting(paymentDTO.meetingId)
-        if(meeting.isEmpty)
+        val meetingFromDatabase = meetingService.getMeeting(paymentDTO.meetingId)
+        if(meetingFromDatabase.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
 
-        payment.userProfile = user.get()
-        payment.meeting = meeting.get()
+        val payment = Payment().apply {
+            userProfile = user.get()
+            meeting = meetingFromDatabase.get()
+        }
         return payment
-    }
-
-    fun verifyDto(paymentDTO: PaymentPostDTO) {
-        if(paymentDTO.price < BigDecimal.ZERO)
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NEGATIVE_PRICE)
     }
 }

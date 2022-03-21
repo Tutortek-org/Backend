@@ -16,9 +16,6 @@ data class Payment(
     @Column(name = "date", nullable = false)
     var date: Date = Date(System.currentTimeMillis()),
 
-    @Column(name = "price", nullable = false)
-    var price: BigDecimal = BigDecimal(0.0),
-
     @ManyToOne
     @JoinColumn(name = "user_profile_id", nullable = false)
     var userProfile: UserProfile = UserProfile(),
@@ -29,7 +26,6 @@ data class Payment(
 ) {
     fun copy(payment: Payment){
         date = payment.date
-        price = payment.price
         userProfile = payment.userProfile
         meeting = payment.meeting
     }
