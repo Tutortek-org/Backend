@@ -30,9 +30,6 @@ data class UserProfile(
     var description: String = "",
 
     @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.REMOVE])
-    var payments: MutableList<Payment> = mutableListOf(),
-
-    @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.REMOVE])
     var topics: MutableList<Topic> = mutableListOf()
 ){
     @OneToOne

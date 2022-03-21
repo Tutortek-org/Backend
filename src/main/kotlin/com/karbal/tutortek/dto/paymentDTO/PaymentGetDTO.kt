@@ -6,12 +6,10 @@ import java.sql.Date
 
 data class PaymentGetDTO(
     val id: Long?,
-    val price: BigDecimal,
     val date: Date
 ){
     constructor(payment: Payment) : this(
         payment.id,
-        payment.price,
         payment.date
     )
 }
