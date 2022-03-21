@@ -26,7 +26,10 @@ data class User(
     var userProfile: UserProfile? = null,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
-    var bugReports: MutableList<BugReport> = mutableListOf()
+    var bugReports: MutableList<BugReport> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
+    var payments: MutableList<Payment> = mutableListOf(),
 ) {
 
     @ManyToMany(fetch = FetchType.EAGER)

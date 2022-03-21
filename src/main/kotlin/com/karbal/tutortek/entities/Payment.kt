@@ -1,6 +1,5 @@
 package com.karbal.tutortek.entities
 
-import java.math.BigDecimal
 import java.sql.Date
 import javax.persistence.*
 
@@ -17,8 +16,8 @@ data class Payment(
     var date: Date = Date(System.currentTimeMillis()),
 
     @ManyToOne
-    @JoinColumn(name = "user_profile_id", nullable = false)
-    var userProfile: UserProfile = UserProfile(),
+    @JoinColumn(name = "user_id", nullable = false)
+    var user: User = User(),
 
     @ManyToOne
     @JoinColumn(name = "meeting_id")
@@ -26,7 +25,7 @@ data class Payment(
 ) {
     fun copy(payment: Payment){
         date = payment.date
-        userProfile = payment.userProfile
+        user = payment.user
         meeting = payment.meeting
     }
 }
