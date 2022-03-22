@@ -6,24 +6,30 @@ import com.karbal.tutortek.entities.Payment
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.constants.SecurityConstants
+import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
 import com.karbal.tutortek.services.UserService
+import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("payments")
 class PaymentController(
     val paymentService: PaymentService,
     val userService: UserService,
-    val meetingService: MeetingService) {
+    val meetingService: MeetingService,
+    private val jwtTokenUtil: JwtTokenUtil
+) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun addPayment(@RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
-        val payment = convertDtoToEntity(paymentDTO)
+    fun addPayment(@RequestBody paymentDTO: PaymentPostDTO, request: HttpServletRequest): PaymentGetDTO {
+        val payment = convertDtoToEntity(paymentDTO, request)
         return PaymentGetDTO(paymentService.savePayment(payment))
     }
 
@@ -49,8 +55,8 @@ class PaymentController(
     }
 
     @PutMapping("{id}")
-    fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO): PaymentGetDTO {
-        val payment = convertDtoToEntity(paymentDTO)
+    fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO, request: HttpServletRequest): PaymentGetDTO {
+        val payment = convertDtoToEntity(paymentDTO, request)
         val paymentInDatabase = paymentService.getPayment(id)
 
         if(paymentInDatabase.isEmpty)
@@ -61,9 +67,12 @@ class PaymentController(
         return PaymentGetDTO(paymentService.savePayment(extractedPayment))
     }
 
-    fun convertDtoToEntity(paymentDTO: PaymentPostDTO): Payment {
+    fun convertDtoToEntity(paymentDTO: PaymentPostDTO, request: HttpServletRequest): Payment {
+        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val userId = claims?.get("uid").toString().toLong()
 
-        val userFromDatabase = userService.getUserById(paymentDTO.userId)
+        val userFromDatabase = userService.getUserById(userId)
         if(userFromDatabase.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
 
