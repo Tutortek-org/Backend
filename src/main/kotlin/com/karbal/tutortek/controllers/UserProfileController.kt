@@ -44,14 +44,15 @@ class UserProfileController(
     fun addProfilePicture(@RequestParam photo: MultipartFile, request: HttpServletRequest) {
         val claims = jwtTokenUtil.parseClaimsFromRequest(request)
         val email = claims?.get("sub").toString()
-        S3Utils.uploadFile("pfp_$email", photo.inputStream)
+        S3Utils.uploadFile("pfp_$email.png", photo.inputStream)
     }
 
-    @GetMapping("/picture", produces = [MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE])
-    fun getProfilePicture(request: HttpServletRequest): ByteArray? {
-        val claims = jwtTokenUtil.parseClaimsFromRequest(request)
-        val email = claims?.get("sub").toString()
-        val file = S3Utils.downloadFile("pfp_$email")
+    @GetMapping("{id}/picture", produces = [MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE])
+    fun getProfilePicture(@PathVariable id: Long, request: HttpServletRequest): ByteArray? {
+        val userProfile = userProfileService.getUserProfile(id)
+        if(userProfile.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+        val file = S3Utils.downloadFile("pfp_${userProfile.get().user.email}.png")
         return IOUtils.toByteArray(file)
     }
 
