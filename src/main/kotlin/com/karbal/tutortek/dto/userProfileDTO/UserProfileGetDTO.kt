@@ -10,15 +10,17 @@ data class UserProfileGetDTO(
     val rating: Float,
     val birthDate: Date,
     val description: String,
-    val topicCount: Int
+    val topicCount: Int,
+    val roles: List<String>
 ){
-    constructor(userProfile: UserProfile, topicCount: Int) : this(
+    constructor(userProfile: UserProfile) : this(
         userProfile.id,
         userProfile.firstName,
         userProfile.lastName,
         userProfile.rating,
         userProfile.birthDate,
         userProfile.description,
-        topicCount
+        userProfile.topics.size,
+        userProfile.user.roles.map { re -> re.name }
     )
 }

@@ -15,8 +15,8 @@ import javax.annotation.security.RolesAllowed
 
 @RestController
 class LearningMaterialController(
-    val learningMaterialService: LearningMaterialService,
-    val topicService: TopicService
+    private val learningMaterialService: LearningMaterialService,
+    private val topicService: TopicService
 ) {
 
     @GetMapping("topics/{topicId}/meetings/{meetingId}/materials")

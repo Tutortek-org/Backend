@@ -17,8 +17,9 @@ import java.sql.Date
 @RestController
 @RequestMapping("topics/{topicId}/meetings")
 class MeetingController(
-    val meetingService: MeetingService,
-    val topicService: TopicService) {
+    private val meetingService: MeetingService,
+    private val topicService: TopicService
+) {
 
     @GetMapping
     fun getAllMeetings(@PathVariable topicId: Long): List<MeetingGetDTO> {
