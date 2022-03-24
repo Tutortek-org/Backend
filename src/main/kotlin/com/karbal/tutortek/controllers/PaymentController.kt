@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @RequestMapping("payments")
 class PaymentController(
-    val paymentService: PaymentService,
-    val userService: UserService,
-    val meetingService: MeetingService,
+    private val paymentService: PaymentService,
+    private val userService: UserService,
+    private val meetingService: MeetingService,
     private val jwtTokenUtil: JwtTokenUtil
 ) {
 

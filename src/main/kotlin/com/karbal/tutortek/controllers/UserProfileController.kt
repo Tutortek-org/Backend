@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @RequestMapping("profiles")
 class UserProfileController(
-    val userProfileService: UserProfileService,
-    val userService: UserService,
-    val jwtTokenUtil: JwtTokenUtil
+    private val userProfileService: UserProfileService,
+    private val userService: UserService,
+    private val jwtTokenUtil: JwtTokenUtil
 ) {
 
     @PostMapping
@@ -37,7 +37,7 @@ class UserProfileController(
         val email = claims?.get("sub").toString()
         val user = userService.getUserByEmail(email)
         userProfile.user = user
-        return UserProfileGetDTO(userProfileService.saveUserProfile(userProfile), 0)
+        return UserProfileGetDTO(userProfileService.saveUserProfile(userProfile))
     }
 
     @PutMapping("/picture")
@@ -65,7 +65,7 @@ class UserProfileController(
     }
 
     @GetMapping
-    fun getAllUserProfiles() = userProfileService.getAllUserProfiles().map { up -> UserProfileGetDTO(up, up.topics.size) }
+    fun getAllUserProfiles() = userProfileService.getAllUserProfiles().map { up -> UserProfileGetDTO(up) }
 
     @GetMapping("{id}")
     fun getUserProfile(@PathVariable id: Long): UserProfileGetDTO {
@@ -73,7 +73,7 @@ class UserProfileController(
         if(userProfile.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
         val userProfileInDatabase = userProfile.get()
-        return UserProfileGetDTO(userProfileInDatabase, userProfileInDatabase.topics.size)
+        return UserProfileGetDTO(userProfileInDatabase)
     }
 
     @PutMapping("{id}")
@@ -88,7 +88,7 @@ class UserProfileController(
         val extractedUserProfile = userProfileInDatabase.get()
         extractedUserProfile.copy(userProfile)
 
-        return UserProfileGetDTO(userProfileService.saveUserProfile(extractedUserProfile), extractedUserProfile.topics.size)
+        return UserProfileGetDTO(userProfileService.saveUserProfile(extractedUserProfile))
     }
 
     fun verifyPostDto(userProfileDTO: UserProfilePostDTO) {
