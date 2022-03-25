@@ -47,6 +47,21 @@ class TopicController(
     @GetMapping
     fun getAllTopics() = topicService.getAllTopics().map { t -> TopicGetDTO(t) }
 
+    @GetMapping("personal")
+    @RolesAllowed(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
+    fun getPersonalTopics(request: HttpServletRequest): List<TopicGetDTO> {
+        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val userProfileId = claims?.get("pid").toString().toLong()
+
+        val userProfile = userProfileService.getUserProfile(userProfileId)
+        if(userProfile.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+        val userFromDatabase = userProfile.get()
+
+        return userFromDatabase.topics.map { t -> TopicGetDTO(t) }
+    }
+
     @GetMapping("unapproved")
     @Secured(Role.ADMIN_ANNOTATION)
     fun getAllUnapproved() = topicService.getAllUnapproved().map { t -> TopicGetDTO(t) }
