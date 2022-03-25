@@ -6,6 +6,7 @@ import com.karbal.tutortek.dto.userProfileDTO.UserProfilePostDTO
 import com.karbal.tutortek.entities.UserProfile
 import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.dto.ratingDTO.RatingPatchDTO
 import com.karbal.tutortek.dto.userProfileDTO.UserProfilePutDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.UserService
@@ -90,6 +91,21 @@ class UserProfileController(
         extractedUserProfile.copy(userProfile)
 
         return UserProfileGetDTO(userProfileService.saveUserProfile(extractedUserProfile))
+    }
+
+    @PatchMapping("{id}")
+    fun addRating(@PathVariable id: Long, @RequestBody ratingPatchDTO: RatingPatchDTO): UserProfileGetDTO {
+        val userProfile = userProfileService.getUserProfile(id)
+        if(userProfile.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+        val userProfileInDatabase = userProfile.get()
+
+        var summedRatings = userProfileInDatabase.rating * userProfileInDatabase.ratingAmount
+        summedRatings += ratingPatchDTO.rating
+        ++userProfileInDatabase.ratingAmount
+        userProfileInDatabase.rating = summedRatings / userProfileInDatabase.ratingAmount
+
+        return UserProfileGetDTO(userProfileService.saveUserProfile(userProfileInDatabase))
     }
 
     fun verifyPostDto(userProfileDTO: UserProfilePostDTO) {

@@ -29,6 +29,9 @@ data class UserProfile(
     @Column(name = "description", nullable = false)
     var description: String = "",
 
+    @Column(name = "ratingAmount", nullable = false)
+    var ratingAmount: Long = 0,
+
     @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.REMOVE])
     var topics: MutableList<Topic> = mutableListOf()
 ){
