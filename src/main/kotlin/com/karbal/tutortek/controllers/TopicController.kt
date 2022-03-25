@@ -89,6 +89,7 @@ class TopicController(
     private fun convertDtoToEntity(topicDTO: TopicPostDTO, request: HttpServletRequest): Topic {
         val topic = Topic()
         topic.name = topicDTO.name
+        topic.description = topicDTO.description
 
         var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
         if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
@@ -106,5 +107,8 @@ class TopicController(
     private fun verifyDto(topicDTO: TopicPostDTO) {
         if(topicDTO.name.isEmpty())
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NAME_EMPTY)
+
+        if(topicDTO.description.isEmpty())
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.DESCRIPTION_EMPTY)
     }
 }

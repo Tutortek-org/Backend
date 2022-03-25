@@ -14,6 +14,9 @@ data class Topic(
     @Column(name = "name", nullable = false)
     var name: String = "",
 
+    @Column(name = "description", nullable = false)
+    var description: String = "",
+
     @Column(name = "isApproved", nullable = false)
     var isApproved: Boolean = false,
 
@@ -26,6 +29,7 @@ data class Topic(
 ) {
     fun copy(topic: Topic) {
         name = topic.name
+        description = topic.description
         isApproved = topic.isApproved
         meetings = topic.meetings
         userProfile = topic.userProfile
