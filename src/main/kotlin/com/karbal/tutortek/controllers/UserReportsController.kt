@@ -5,16 +5,20 @@ import com.karbal.tutortek.dto.userReportDTO.UserReportGetDTO
 import com.karbal.tutortek.dto.userReportDTO.UserReportPostDTO
 import com.karbal.tutortek.entities.UserReport
 import com.karbal.tutortek.security.JwtTokenUtil
+import com.karbal.tutortek.security.Role
 import com.karbal.tutortek.services.UserReportService
 import com.karbal.tutortek.services.UserService
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import javax.annotation.security.RolesAllowed
 import javax.servlet.http.HttpServletRequest
 
 @RestController
@@ -34,7 +38,18 @@ class UserReportsController(
     }
 
     @GetMapping
+    @RolesAllowed(Role.ADMIN_ANNOTATION)
     fun getAllReports() = userReportService.getAllUserReports().map { ur -> UserReportGetDTO(ur) }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RolesAllowed(Role.ADMIN_ANNOTATION)
+    fun deleteReport(@PathVariable id: Long) {
+        val userReport = userReportService.getUserReport(id)
+        if(userReport.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_REPORT_NOT_FOUND)
+        userReportService.deleteUserReport(id)
+    }
 
     private fun convertDtoToEntity(userReportPostDTO: UserReportPostDTO, request: HttpServletRequest): UserReport {
         val userReport = UserReport()
