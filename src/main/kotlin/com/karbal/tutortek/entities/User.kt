@@ -28,6 +28,12 @@ data class User(
     @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
     var bugReports: MutableList<BugReport> = mutableListOf(),
 
+    @OneToMany(mappedBy = "reportedBy", cascade = [CascadeType.REMOVE])
+    var userReports: MutableList<UserReport> = mutableListOf(),
+
+    @OneToMany(mappedBy = "reportOf", cascade = [CascadeType.REMOVE])
+    var reportsOfThis: MutableList<UserReport> = mutableListOf(),
+
     @OneToMany(mappedBy = "user", cascade = [CascadeType.REMOVE])
     var payments: MutableList<Payment> = mutableListOf(),
 ) {

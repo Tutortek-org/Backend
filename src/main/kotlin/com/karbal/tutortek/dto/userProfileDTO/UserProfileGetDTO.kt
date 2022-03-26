@@ -11,7 +11,8 @@ data class UserProfileGetDTO(
     val birthDate: Date,
     val description: String,
     val topicCount: Int,
-    val roles: List<String>
+    val roles: List<String>,
+    val belongsTo: Long?
 ){
     constructor(userProfile: UserProfile) : this(
         userProfile.id,
@@ -21,6 +22,7 @@ data class UserProfileGetDTO(
         userProfile.birthDate,
         userProfile.description,
         userProfile.topics.size,
-        userProfile.user.roles.map { re -> re.name }
+        userProfile.user.roles.map { re -> re.name },
+        userProfile.user.id
     )
 }
