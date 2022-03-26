@@ -6,22 +6,28 @@ import com.karbal.tutortek.entities.Meeting
 import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.constants.SecurityConstants
+import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
+import com.karbal.tutortek.services.UserService
+import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
 import java.sql.Date
+import javax.servlet.http.HttpServletRequest
 
 @RestController
-@RequestMapping("topics/{topicId}/meetings")
 class MeetingController(
     private val meetingService: MeetingService,
-    private val topicService: TopicService
+    private val topicService: TopicService,
+    private val jwtTokenUtil: JwtTokenUtil,
+    private val userService: UserService
 ) {
 
-    @GetMapping
+    @GetMapping("topics/{topicId}/meetings")
     fun getAllMeetings(@PathVariable topicId: Long): List<MeetingGetDTO> {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
@@ -29,7 +35,7 @@ class MeetingController(
         return topic.get().meetings.map { m -> MeetingGetDTO(m) }
     }
 
-    @GetMapping("{meetingId}")
+    @GetMapping("topics/{topicId}/meetings/{meetingId}")
     fun getMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long): MeetingGetDTO {
         val topic = topicService.getTopic(topicId)
 
@@ -41,7 +47,21 @@ class MeetingController(
         return MeetingGetDTO(meeting)
     }
 
-    @PostMapping
+    @GetMapping("meetings/personal")
+    fun getPersonalMeetings(request: HttpServletRequest): List<MeetingGetDTO> {
+        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
+
+        val userId = claims?.get("uid").toString().toLong()
+        val user = userService.getUserById(userId)
+        if(user.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+        val userFromDatabase = user.get()
+
+        return userFromDatabase.payments.map { p -> MeetingGetDTO(p.meeting) }
+    }
+
+    @PostMapping("topics/{topicId}/meetings")
     @ResponseStatus(HttpStatus.CREATED)
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun addMeeting(@PathVariable topicId: Long, @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
@@ -56,7 +76,7 @@ class MeetingController(
         return MeetingGetDTO(meetingService.saveMeeting(meeting))
     }
 
-    @DeleteMapping("{meetingId}")
+    @DeleteMapping("topics/{topicId}/meetings/{meetingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun deleteMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long) {
@@ -68,7 +88,7 @@ class MeetingController(
         meeting.id?.let { meetingService.deleteMeeting(it) }
     }
 
-    @PutMapping("{meetingId}")
+    @PutMapping("topics/{topicId}/meetings/{meetingId}")
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun updateMeeting(@PathVariable topicId: Long,
                       @PathVariable meetingId: Long,
