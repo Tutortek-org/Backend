@@ -9,4 +9,4 @@ In order for this to work on your local environment create a file in `src/main/r
 is used for staging environments.
 
 ## Database population
-If you want your database to be repopulated compile with `--repopulate` flag.
+If you want your database to be repopulated compile with `--reseed` flag.

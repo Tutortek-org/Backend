@@ -7,6 +7,7 @@ import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.constants.SecurityConstants
+import com.karbal.tutortek.dto.meetingDTO.PersonalMeetingGetDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
 import com.karbal.tutortek.services.UserService
@@ -48,7 +49,7 @@ class MeetingController(
     }
 
     @GetMapping("meetings/personal")
-    fun getPersonalMeetings(request: HttpServletRequest): List<MeetingGetDTO> {
+    fun getPersonalMeetings(request: HttpServletRequest): List<PersonalMeetingGetDTO> {
         var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
         if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
 
@@ -58,7 +59,7 @@ class MeetingController(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
         val userFromDatabase = user.get()
 
-        return userFromDatabase.payments.map { p -> MeetingGetDTO(p.meeting) }
+        return userFromDatabase.payments.map { p -> PersonalMeetingGetDTO(p.meeting) }
     }
 
     @PostMapping("topics/{topicId}/meetings")
