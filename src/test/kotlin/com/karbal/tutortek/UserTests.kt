@@ -34,7 +34,7 @@ class UserTests(
     }
 
     @Test
-    fun userTest() {
+    fun userCount() {
         assertThat(userService.getAllUsers().size).isEqualTo(1)
     }
 
