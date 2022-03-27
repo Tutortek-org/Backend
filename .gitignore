@@ -34,3 +34,4 @@ build/
 
 ### Credentials ###
 src/main/resources/application-local.properties
+src/main/resources/application-integrationtest.properties

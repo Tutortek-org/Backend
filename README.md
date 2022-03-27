@@ -10,3 +10,6 @@ is used for staging environments.
 
 ## Database population
 If you want your database to be repopulated compile with `--reseed` flag.
+
+## Testing
+Tests should use a separate configuration file and `JUnit 5`. All needed dependencies are already in the `pom.xml` file.
