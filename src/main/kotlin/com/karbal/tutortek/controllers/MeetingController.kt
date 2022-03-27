@@ -30,12 +30,24 @@ class MeetingController(
 ) {
 
     @GetMapping("topics/{topicId}/meetings")
-    fun getAllMeetings(@PathVariable topicId: Long): List<MeetingGetDTO> {
+    fun getAllMeetings(@PathVariable topicId: Long, request: HttpServletRequest): List<MeetingGetDTO> {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
+
+        val claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val userId = claims?.get("uid").toString().toLong()
+        val user = userService.getUserById(userId)
+        if(user.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+        val userFromDatabase = user.get()
+
         return topic.get().meetings
-            .filter { m -> m.date > Date(System.currentTimeMillis()) }
+            .filter { m ->
+                m.date > Date(System.currentTimeMillis())
+                        && m.payments.size < m.maxAttendants
+                        && !userFromDatabase.payments.any { p -> p.meeting.id == m.id }
+            }
             .map { m -> MeetingGetDTO(m) }
     }
 
