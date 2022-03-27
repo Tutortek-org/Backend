@@ -30,15 +30,13 @@ class UserProfileTests(
     @BeforeEach
     fun setUp() {
         val user = User(email = "junit@test.com", password = "Junit1234")
-        userService.saveUser(user)
+        latestUser = userService.saveUser(user)
 
         val userProfile = UserProfile(firstName = "Junit", lastName = "Tester")
-        val userFromDatabase = userService.getFirstUser()
-
-        userProfile.user = userFromDatabase
+        userProfile.user = latestUser
         user.userProfile = userProfile
         latestProfile = userProfileService.saveUserProfile(userProfile)
-        latestUser = userService.saveUser(userFromDatabase)
+        latestUser = userService.saveUser(latestUser)
     }
 
     @AfterEach

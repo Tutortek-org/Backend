@@ -36,10 +36,9 @@ class MeetingTests(
     @BeforeEach
     fun setUp() {
         val user = User(email = "junit@test.com", password = "Junit1234")
-        userService.saveUser(user)
+        val userFromDatabase = userService.saveUser(user)
 
         val userProfile = UserProfile(firstName = "Junit", lastName = "Tester")
-        val userFromDatabase = userService.getFirstUser()
         userProfile.user = userFromDatabase
         user.userProfile = userProfile
         userProfileService.saveUserProfile(userProfile)
