@@ -13,6 +13,7 @@ data class PersonalMeetingGetDTO(
     val address: String,
     val description: String,
     val price: BigDecimal,
+    val profileId: Long?,
     val topic: TopicGetDTO
 ){
     constructor(meeting: Meeting) : this(
@@ -23,6 +24,7 @@ data class PersonalMeetingGetDTO(
         meeting.address,
         meeting.description,
         meeting.price,
+        meeting.topic.userProfile.id,
         TopicGetDTO(meeting.topic)
     )
 }
