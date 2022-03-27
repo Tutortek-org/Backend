@@ -29,7 +29,7 @@ class LearningMaterialController(
         val meeting = topic.get().meetings.find { m -> m.id == meetingId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
 
-        return meeting.learningMaterials.map { lm -> LearningMaterialGetDTO(lm) }
+        return meeting.learningMaterials.filter { lm -> lm.isApproved }.map { lm -> LearningMaterialGetDTO(lm) }
     }
 
     @GetMapping("topics/{topicId}/meetings/{meetingId}/materials/{materialId}")

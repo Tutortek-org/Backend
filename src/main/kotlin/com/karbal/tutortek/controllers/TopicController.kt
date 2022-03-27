@@ -45,7 +45,7 @@ class TopicController(
     }
 
     @GetMapping
-    fun getAllTopics() = topicService.getAllTopics().map { t -> TopicGetDTO(t) }
+    fun getAllTopics() = topicService.getAllTopics().filter { t -> t.isApproved }.map { t -> TopicGetDTO(t) }
 
     @GetMapping("personal")
     @RolesAllowed(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
