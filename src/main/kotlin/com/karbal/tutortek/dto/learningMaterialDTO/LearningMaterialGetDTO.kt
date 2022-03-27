@@ -7,13 +7,15 @@ data class LearningMaterialGetDTO(
     val name: String,
     val description: String,
     val link: String,
-    val isApproved: Boolean
+    val isApproved: Boolean,
+    val profileId: Long?
 ){
     constructor(learningMaterial: LearningMaterial) : this(
         learningMaterial.id,
         learningMaterial.name,
         learningMaterial.description,
         learningMaterial.link,
-        learningMaterial.isApproved
+        learningMaterial.isApproved,
+        learningMaterial.meeting.topic.userProfile.id
     )
 }
