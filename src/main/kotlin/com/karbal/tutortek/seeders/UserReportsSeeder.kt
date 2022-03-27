@@ -17,11 +17,13 @@ class UserReportsSeeder(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
-            userReportService.clearUserReports()
-            val user = userService.getFirstUser()
-            val userReport = UserReport(null, "Populated description", user, user)
-            userReportService.saveUserReport(userReport)
+        args?.let {
+            if(it.sourceArgs.contains(CommandLineArguments.RESEED)) {
+                userReportService.clearUserReports()
+                val user = userService.getFirstUser()
+                val userReport = UserReport(null, "Populated description", user, user)
+                userReportService.saveUserReport(userReport)
+            }
         }
     }
 }

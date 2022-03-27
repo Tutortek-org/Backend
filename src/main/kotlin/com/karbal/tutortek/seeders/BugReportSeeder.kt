@@ -17,11 +17,13 @@ class BugReportSeeder(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
-            bugReportService.clearBugReports()
-            val user = userService.getFirstUser()
-            val bugReport = BugReport(null, "Populated name", "Populate description", user)
-            bugReportService.saveBugReport(bugReport)
+        args?.let {
+            if(it.sourceArgs.contains(CommandLineArguments.RESEED)) {
+                bugReportService.clearBugReports()
+                val user = userService.getFirstUser()
+                val bugReport = BugReport(null, "Populated name", "Populate description", user)
+                bugReportService.saveBugReport(bugReport)
+            }
         }
     }
 }

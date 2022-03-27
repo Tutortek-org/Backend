@@ -19,15 +19,17 @@ class PaymentSeeder(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
-            paymentService.clearPayments()
-            val user = userService.getFirstUser()
-            val meeting = meetingService.getFirstMeeting()
-            paymentService.savePayment(Payment(
-                null,
-                user = user,
-                meeting = meeting
-            ))
+        args?.let {
+            if(it.sourceArgs.contains(CommandLineArguments.RESEED)) {
+                paymentService.clearPayments()
+                val user = userService.getFirstUser()
+                val meeting = meetingService.getFirstMeeting()
+                paymentService.savePayment(Payment(
+                    null,
+                    user = user,
+                    meeting = meeting
+                ))
+            }
         }
     }
 }
