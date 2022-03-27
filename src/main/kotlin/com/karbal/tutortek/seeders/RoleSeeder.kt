@@ -13,12 +13,14 @@ import org.springframework.stereotype.Component
 @Order(1)
 class RoleSeeder(private val roleService: RoleService) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.any { it == CommandLineArguments.RESEED || it == CommandLineArguments.DB_ROLES }) {
-            roleService.deleteAllRecordsFromUserRole()
-            roleService.clearRoles()
-            Role.values().forEach {
-                val id = it.ordinal + 1L
-                roleService.saveRole(RoleEntity(id, it.name))
+        args?.let {
+            if(it.sourceArgs.any { sa -> sa == CommandLineArguments.RESEED || sa == CommandLineArguments.DB_ROLES }) {
+                roleService.deleteAllRecordsFromUserRole()
+                roleService.clearRoles()
+                Role.values().forEach { r ->
+                    val id = r.ordinal + 1L
+                    roleService.saveRole(RoleEntity(id, r.name))
+                }
             }
         }
     }

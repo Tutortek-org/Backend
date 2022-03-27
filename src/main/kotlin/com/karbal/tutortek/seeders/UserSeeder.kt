@@ -19,17 +19,19 @@ class UserSeeder(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
-            userService.clearUsers()
-            val user = User(
-                null,
-                "populated@email.com",
-                BCryptPasswordEncoder().encode("PopulatedPassword"),
-                false
-            )
-            val role = roleService.getRole(1)
-            user.roles.add(role.get())
-            userService.saveUser(user)
+        args?.let {
+            if(it.sourceArgs.contains(CommandLineArguments.RESEED)) {
+                userService.clearUsers()
+                val user = User(
+                    null,
+                    "populated@email.com",
+                    BCryptPasswordEncoder().encode("PopulatedPassword"),
+                    false
+                )
+                val role = roleService.getRole(1)
+                user.roles.add(role.get())
+                userService.saveUser(user)
+            }
         }
     }
 }

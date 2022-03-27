@@ -7,7 +7,7 @@ data class TopicGetDTO(
     val name: String,
     val description: String,
     val isApproved: Boolean,
-    val userId: Long?
+    val profileId: Long?
 ){
     constructor(topic: Topic) : this(
         topic.id,

@@ -16,15 +16,17 @@ class TopicSeeder(
     private val userProfileService: UserProfileService) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
-            topicService.clearTopics()
-            val user = userProfileService.getFirstUserProfile()
-            topicService.saveTopic(Topic(null,
-                "Populated topic",
-                "Populated description",
-                true,
-                userProfile = user
-            ))
+        args?.let {
+            if(it.sourceArgs.contains(CommandLineArguments.RESEED)) {
+                topicService.clearTopics()
+                val user = userProfileService.getFirstUserProfile()
+                topicService.saveTopic(Topic(null,
+                    "Populated topic",
+                    "Populated description",
+                    true,
+                    userProfile = user
+                ))
+            }
         }
     }
 }

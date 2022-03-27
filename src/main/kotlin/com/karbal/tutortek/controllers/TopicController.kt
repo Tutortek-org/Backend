@@ -37,15 +37,19 @@ class TopicController(
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RolesAllowed(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
-    fun deleteTopic(@PathVariable id: Long){
+    fun deleteTopic(@PathVariable id: Long, request: HttpServletRequest){
         val topic = topicService.getTopic(id)
         if(topic.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
+
+        val topicFromDatabase = topic.get()
+        verifyUserProfileID(topicFromDatabase, request)
+
         topicService.deleteTopic(id)
     }
 
     @GetMapping
-    fun getAllTopics() = topicService.getAllTopics().map { t -> TopicGetDTO(t) }
+    fun getAllTopics() = topicService.getAllTopics().filter { t -> t.isApproved }.map { t -> TopicGetDTO(t) }
 
     @GetMapping("personal")
     @RolesAllowed(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
@@ -85,6 +89,8 @@ class TopicController(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
 
         val extractedTopic = topicInDatabase.get()
+        verifyUserProfileID(extractedTopic, request)
+
         extractedTopic.copy(topic)
         return TopicGetDTO(topicService.saveTopic(extractedTopic))
     }
@@ -99,6 +105,13 @@ class TopicController(
         val extractedTopic = topicInDatabase.get()
         extractedTopic.isApproved = true
         return TopicGetDTO(topicService.saveTopic(extractedTopic))
+    }
+
+    private fun verifyUserProfileID(topic: Topic, request: HttpServletRequest) {
+        val claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val profileId = claims?.get("pid").toString().toLong()
+        if(topic.userProfile.id != profileId)
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, ApiErrorSlug.USER_FORBIDDEN_FROM_ALTERING)
     }
 
     private fun convertDtoToEntity(topicDTO: TopicPostDTO, request: HttpServletRequest): Topic {

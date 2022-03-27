@@ -17,17 +17,19 @@ class LearningMaterialSeeder(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
-            learningMaterialService.clearLearningMaterials()
-            val meeting = meetingService.getFirstMeeting()
-            learningMaterialService.saveLearningMaterial(LearningMaterial(
-                null,
-                "Populated material",
-                "Populated description",
-                "populated.com/link",
-                true,
-                meeting
-            ))
+        args?.let {
+            if(it.sourceArgs.contains(CommandLineArguments.RESEED)) {
+                learningMaterialService.clearLearningMaterials()
+                val meeting = meetingService.getFirstMeeting()
+                learningMaterialService.saveLearningMaterial(LearningMaterial(
+                    null,
+                    "Populated material",
+                    "Populated description",
+                    "populated.com/link",
+                    true,
+                    meeting
+                ))
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ import com.karbal.tutortek.services.MeetingService
 import com.karbal.tutortek.services.PaymentService
 import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.constants.SecurityConstants
+import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
 import com.karbal.tutortek.services.UserService
@@ -29,7 +30,12 @@ class PaymentController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addPayment(@RequestBody paymentDTO: PaymentPostDTO, request: HttpServletRequest): PaymentGetDTO {
-        val payment = convertDtoToEntity(paymentDTO, request)
+        val userFromDatabase = extractUser(request)
+
+        if(userFromDatabase.payments.any { p -> p.meeting.id == paymentDTO.meetingId })
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USER_ALREADY_SIGNED_UP)
+
+        val payment = convertDtoToEntity(paymentDTO, userFromDatabase)
         return PaymentGetDTO(paymentService.savePayment(payment))
     }
 
@@ -56,7 +62,8 @@ class PaymentController(
 
     @PutMapping("{id}")
     fun updatePayment(@PathVariable id: Long, @RequestBody paymentDTO: PaymentPostDTO, request: HttpServletRequest): PaymentGetDTO {
-        val payment = convertDtoToEntity(paymentDTO, request)
+        val userFromDatabase = extractUser(request)
+        val payment = convertDtoToEntity(paymentDTO, userFromDatabase)
         val paymentInDatabase = paymentService.getPayment(id)
 
         if(paymentInDatabase.isEmpty)
@@ -67,21 +74,22 @@ class PaymentController(
         return PaymentGetDTO(paymentService.savePayment(extractedPayment))
     }
 
-    fun convertDtoToEntity(paymentDTO: PaymentPostDTO, request: HttpServletRequest): Payment {
-        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
-        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
+    private fun extractUser(request: HttpServletRequest): User {
+        val claims = jwtTokenUtil.parseClaimsFromRequest(request)
         val userId = claims?.get("uid").toString().toLong()
-
-        val userFromDatabase = userService.getUserById(userId)
-        if(userFromDatabase.isEmpty)
+        val user = userService.getUserById(userId)
+        if(user.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
+        return user.get()
+    }
 
+    private fun convertDtoToEntity(paymentDTO: PaymentPostDTO, userFromDatabase: User): Payment {
         val meetingFromDatabase = meetingService.getMeeting(paymentDTO.meetingId)
         if(meetingFromDatabase.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
 
         val payment = Payment().apply {
-            user = userFromDatabase.get()
+            user = userFromDatabase
             meeting = meetingFromDatabase.get()
         }
         return payment

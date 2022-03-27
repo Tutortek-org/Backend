@@ -19,20 +19,22 @@ class MeetingSeeder(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-        if(args!!.sourceArgs.contains(CommandLineArguments.RESEED)) {
-            meetingService.clearMeetings()
-            val topic = topicService.getFirstTopic()
-            val date = Date(System.currentTimeMillis() + 1000000)
-            meetingService.saveMeeting(Meeting(
-                null,
-                "Populated meeting",
-                date,
-                5,
-                "Populated address",
-                "Populated description",
-                BigDecimal(7.0),
-                topic = topic
-            ))
+        args?.let {
+            if(it.sourceArgs.contains(CommandLineArguments.RESEED)) {
+                meetingService.clearMeetings()
+                val topic = topicService.getFirstTopic()
+                val date = Date(System.currentTimeMillis() + 1000000)
+                meetingService.saveMeeting(Meeting(
+                    null,
+                    "Populated meeting",
+                    date,
+                    5,
+                    "Populated address",
+                    "Populated description",
+                    BigDecimal(7.0),
+                    topic = topic
+                ))
+            }
         }
     }
 }
