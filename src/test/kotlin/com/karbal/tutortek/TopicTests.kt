@@ -37,10 +37,10 @@ class TopicTests(
 		val userProfile = UserProfile(firstName = "Junit", lastName = "Tester")
 		userProfile.user = userFromDatabase
 		user.userProfile = userProfile
-		userProfileService.saveUserProfile(userProfile)
+		val profileFromDatabase = userProfileService.saveUserProfile(userProfile)
 		userService.saveUser(userFromDatabase)
 
-		val topic = Topic(name = "Test name", description = "Test description", userProfile = userProfileService.getFirstUserProfile())
+		val topic = Topic(name = "Test name", description = "Test description", userProfile = profileFromDatabase)
 		latestTopic = topicService.saveTopic(topic)
 	}
 

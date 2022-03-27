@@ -17,28 +17,27 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = [TutortekApplication::class])
 @AutoConfigureMockMvc
 @TestPropertySource(locations = ["classpath:application-integrationtest.properties"])
-class PaymentTests(
+class LearningMaterialTests(
     @Autowired private val topicService: TopicService,
     @Autowired private val userService: UserService,
     @Autowired private val userProfileService: UserProfileService,
     @Autowired private val meetingService: MeetingService,
-    @Autowired private val paymentService: PaymentService
+    @Autowired private val learningMaterialService: LearningMaterialService
 ) {
 
-    private lateinit var latestPayment: Payment
+    private lateinit var latestMaterial: LearningMaterial
     private lateinit var latestMeeting: Meeting
-    private lateinit var latestUser: User
 
     @BeforeEach
     fun setUp() {
         val user = User(email = "junit@test.com", password = "Junit1234")
-        latestUser = userService.saveUser(user)
+        val userFromDatabase = userService.saveUser(user)
 
         val userProfile = UserProfile(firstName = "Junit", lastName = "Tester")
-        userProfile.user = latestUser
+        userProfile.user = userFromDatabase
         user.userProfile = userProfile
         val profileFromDatabase = userProfileService.saveUserProfile(userProfile)
-        userService.saveUser(latestUser)
+        userService.saveUser(userFromDatabase)
 
         val topic = Topic(name = "Test name", description = "Test description", userProfile = profileFromDatabase)
         topicService.saveTopic(topic)
@@ -46,8 +45,8 @@ class PaymentTests(
         val meeting = Meeting(topic = topic)
         latestMeeting = meetingService.saveMeeting(meeting)
 
-        val payment = Payment(user = latestUser, meeting = latestMeeting)
-        latestPayment = paymentService.savePayment(payment)
+        val learningMaterial = LearningMaterial(meeting = latestMeeting)
+        latestMaterial = learningMaterialService.saveLearningMaterial(learningMaterial)
     }
 
     @AfterEach
@@ -56,36 +55,41 @@ class PaymentTests(
         userProfileService.clearUserProfiles()
         userService.clearUsers()
         meetingService.clearMeetings()
-        paymentService.clearPayments()
+        learningMaterialService.clearLearningMaterials()
     }
 
     @Test
-    fun paymentCount() {
-        assertThat(paymentService.getAllPayments().size).isEqualTo(1)
+    fun materialCount() {
+        assertThat(learningMaterialService.getAllLearningMaterials().size).isEqualTo(1)
     }
 
     @Test
-    fun paymentSave() {
-        val payment = Payment(user = latestUser, meeting = latestMeeting)
-        paymentService.savePayment(payment)
-        assertThat(paymentService.getAllPayments().size).isEqualTo(2)
+    fun materialSave() {
+        val learningMaterial = LearningMaterial(meeting = latestMeeting)
+        learningMaterialService.saveLearningMaterial(learningMaterial)
+        assertThat(learningMaterialService.getAllLearningMaterials().size).isEqualTo(2)
     }
 
     @Test
-    fun paymentDelete() {
-        latestPayment.id?.let { paymentService.deletePayment(it) }
-        assertThat(paymentService.getAllPayments().isEmpty())
+    fun materialDelete() {
+        latestMaterial.id?.let { learningMaterialService.deleteLearningMaterial(it) }
+        assertThat(learningMaterialService.getAllLearningMaterials().isEmpty())
     }
 
     @Test
-    fun paymentGet() {
-        val payment = latestPayment.id?.let { paymentService.getPayment(it) }
-        assertThat(payment?.get()?.id).isNotNull
+    fun materialGet() {
+        val material = latestMaterial.id?.let { learningMaterialService.getLearningMaterial(it) }
+        assertThat(material?.get()?.id).isNotNull
     }
 
     @Test
-    fun paymentClear() {
-        paymentService.clearPayments()
-        assertThat(paymentService.getAllPayments().isEmpty())
+    fun materialClear() {
+        learningMaterialService.clearLearningMaterials()
+        assertThat(learningMaterialService.getAllLearningMaterials().isEmpty())
+    }
+
+    @Test
+    fun materialUnapproved() {
+        assertThat(learningMaterialService.getAllUnapproved().size).isEqualTo(1)
     }
 }
