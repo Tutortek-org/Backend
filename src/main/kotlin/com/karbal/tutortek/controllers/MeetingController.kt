@@ -44,7 +44,7 @@ class MeetingController(
 
         return topic.get().meetings
             .filter { m ->
-                m.date > Date(System.currentTimeMillis())
+                m.date >= Date(System.currentTimeMillis())
                         && m.payments.size < m.maxAttendants
                         && !userFromDatabase.payments.any { p -> p.meeting.id == m.id }
             }
@@ -75,7 +75,7 @@ class MeetingController(
         val userFromDatabase = user.get()
 
         return userFromDatabase.payments
-            .filter { m -> m.date > Date(System.currentTimeMillis()) }
+            .filter { p -> p.meeting.date >= Date(System.currentTimeMillis()) }
             .map { p -> PersonalMeetingGetDTO(p.meeting) }
     }
 
