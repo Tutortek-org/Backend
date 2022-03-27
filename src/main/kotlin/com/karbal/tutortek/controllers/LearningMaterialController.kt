@@ -6,17 +6,21 @@ import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
 import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.entities.Topic
+import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import javax.annotation.security.RolesAllowed
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 class LearningMaterialController(
     private val learningMaterialService: LearningMaterialService,
-    private val topicService: TopicService
+    private val topicService: TopicService,
+    private val jwtTokenUtil: JwtTokenUtil
 ) {
 
     @GetMapping("topics/{topicId}/meetings/{meetingId}/materials")
@@ -56,13 +60,17 @@ class LearningMaterialController(
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun addLearningMaterial(@PathVariable topicId: Long,
                             @PathVariable meetingId: Long,
-                            @RequestBody learningMaterialDTO: LearningMaterialPostDTO): LearningMaterialGetDTO {
+                            @RequestBody learningMaterialDTO: LearningMaterialPostDTO,
+                            request: HttpServletRequest): LearningMaterialGetDTO {
         verifyDto(learningMaterialDTO)
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
 
-        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+        val topicFromDatabase = topic.get()
+        verifyUserProfileID(topicFromDatabase, request)
+
+        val meeting = topicFromDatabase.meetings.find { m -> m.id == meetingId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
 
         val learningMaterial = LearningMaterial(learningMaterialDTO)
@@ -73,12 +81,18 @@ class LearningMaterialController(
     @DeleteMapping("topics/{topicId}/meetings/{meetingId}/materials/{materialId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
-    fun deleteLearningMaterial(@PathVariable topicId: Long, @PathVariable meetingId: Long, @PathVariable materialId: Long) {
+    fun deleteLearningMaterial(@PathVariable topicId: Long,
+                               @PathVariable meetingId: Long,
+                               @PathVariable materialId: Long,
+                               request: HttpServletRequest) {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
 
-        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+        val topicFromDatabase = topic.get()
+        verifyUserProfileID(topicFromDatabase, request)
+
+        val meeting = topicFromDatabase.meetings.find { m -> m.id == meetingId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
 
         val learningMaterial = meeting.learningMaterials.find { lm -> lm.id == materialId }
@@ -92,13 +106,17 @@ class LearningMaterialController(
     fun updateLearningMaterial(@PathVariable topicId: Long,
                                @PathVariable meetingId: Long,
                                @PathVariable materialId: Long,
-                               @RequestBody learningMaterialDTO: LearningMaterialPostDTO): LearningMaterialGetDTO {
+                               @RequestBody learningMaterialDTO: LearningMaterialPostDTO,
+                               request: HttpServletRequest): LearningMaterialGetDTO {
         verifyDto(learningMaterialDTO)
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
 
-        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+        val topicFromDatabase = topic.get()
+        verifyUserProfileID(topicFromDatabase, request)
+
+        val meeting = topicFromDatabase.meetings.find { m -> m.id == meetingId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
 
         val learningMaterial = meeting.learningMaterials.find { lm -> lm.id == materialId }
@@ -132,7 +150,14 @@ class LearningMaterialController(
         learningMaterialService.deleteLearningMaterial(id)
     }
 
-    fun verifyDto(learningMaterialDTO: LearningMaterialPostDTO) {
+    private fun verifyUserProfileID(topic: Topic, request: HttpServletRequest) {
+        val claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val profileId = claims?.get("pid").toString().toLong()
+        if(topic.userProfile.id != profileId)
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, ApiErrorSlug.USER_FORBIDDEN_FROM_ALTERING)
+    }
+
+    private fun verifyDto(learningMaterialDTO: LearningMaterialPostDTO) {
         if(learningMaterialDTO.name.isEmpty())
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NAME_EMPTY)
 

@@ -8,6 +8,7 @@ import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.dto.meetingDTO.PersonalMeetingGetDTO
+import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
 import com.karbal.tutortek.services.UserService
@@ -69,27 +70,37 @@ class MeetingController(
     @PostMapping("topics/{topicId}/meetings")
     @ResponseStatus(HttpStatus.CREATED)
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
-    fun addMeeting(@PathVariable topicId: Long, @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
+    fun addMeeting(@PathVariable topicId: Long,
+                   @RequestBody meetingDTO: MeetingPostDTO,
+                   request: HttpServletRequest): MeetingGetDTO {
         verifyDto(meetingDTO)
-        val topic = topicService.getTopic(topicId)
 
+        val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
 
+        val topicFromDatabase = topic.get()
+        verifyUserProfileID(topicFromDatabase, request)
+
         val meeting = Meeting(meetingDTO)
-        meeting.topic = topic.get()
+        meeting.topic = topicFromDatabase
         return MeetingGetDTO(meetingService.saveMeeting(meeting))
     }
 
     @DeleteMapping("topics/{topicId}/meetings/{meetingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
-    fun deleteMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long) {
+    fun deleteMeeting(@PathVariable topicId: Long, @PathVariable meetingId: Long, request: HttpServletRequest) {
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
-        val meeting = topic.get().meetings.find { m -> m.id == meetingId }
+
+        val topicFromDatabase = topic.get()
+        verifyUserProfileID(topicFromDatabase, request)
+
+        val meeting = topicFromDatabase.meetings.find { m -> m.id == meetingId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
+
         meeting.id?.let { meetingService.deleteMeeting(it) }
     }
 
@@ -97,25 +108,37 @@ class MeetingController(
     @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
     fun updateMeeting(@PathVariable topicId: Long,
                       @PathVariable meetingId: Long,
-                      @RequestBody meetingDTO: MeetingPostDTO): MeetingGetDTO {
+                      @RequestBody meetingDTO: MeetingPostDTO,
+                      request: HttpServletRequest): MeetingGetDTO {
         verifyDto(meetingDTO)
         val topic = topicService.getTopic(topicId)
 
         if(topic.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
+
+        val topicFromDatabase = topic.get()
+        verifyUserProfileID(topicFromDatabase, request)
+
         val meeting = topic.get().meetings.find { m -> m.id == meetingId }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
 
         val meetingFromDto = Meeting(meetingDTO)
         meetingFromDto.id = meetingId
-        meetingFromDto.topic = topic.get()
+        meetingFromDto.topic = topicFromDatabase
         meetingFromDto.learningMaterials = meeting.learningMaterials
         meetingFromDto.payments = meeting.payments
 
         return MeetingGetDTO(meetingService.saveMeeting(meetingFromDto))
     }
 
-    fun verifyDto(meetingDTO: MeetingPostDTO) {
+    private fun verifyUserProfileID(topic: Topic, request: HttpServletRequest) {
+        val claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val profileId = claims?.get("pid").toString().toLong()
+        if(topic.userProfile.id != profileId)
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, ApiErrorSlug.USER_FORBIDDEN_FROM_ALTERING)
+    }
+
+    private fun verifyDto(meetingDTO: MeetingPostDTO) {
         if(meetingDTO.name.isEmpty())
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.NAME_EMPTY)
 
