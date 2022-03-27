@@ -7,9 +7,9 @@ import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.services.UserService
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -21,14 +21,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = [TutortekApplication::class])
 @AutoConfigureMockMvc
 @TestPropertySource(locations = ["classpath:application-integrationtest.properties"])
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TutortekApplicationTests(
+class TopicTests(
 	@Autowired private val topicService: TopicService,
 	@Autowired private val userService: UserService,
 	@Autowired private val userProfileService: UserProfileService
 ) {
-	
-	@BeforeAll
+
+	@BeforeEach
 	fun setUp() {
 		val user = User(email = "junit@test.com", password = "Junit1234")
 		userService.saveUser(user)
@@ -44,8 +43,15 @@ class TutortekApplicationTests(
 		topicService.saveTopic(topic)
 	}
 
+	@AfterEach
+	fun teardown() {
+		topicService.clearTopics()
+		userProfileService.clearUserProfiles()
+		userService.clearUsers()
+	}
+
 	@Test
-	fun topicServiceTest() {
+	fun topicCountTest() {
 		assertThat(topicService.getAllTopics().size).isEqualTo(1)
 	}
 }
