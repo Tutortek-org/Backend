@@ -33,7 +33,9 @@ class MeetingController(
         val topic = topicService.getTopic(topicId)
         if(topic.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.TOPIC_NOT_FOUND)
-        return topic.get().meetings.map { m -> MeetingGetDTO(m) }
+        return topic.get().meetings
+            .filter { m -> m.date > Date(System.currentTimeMillis()) }
+            .map { m -> MeetingGetDTO(m) }
     }
 
     @GetMapping("topics/{topicId}/meetings/{meetingId}")
@@ -59,7 +61,9 @@ class MeetingController(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)
         val userFromDatabase = user.get()
 
-        return userFromDatabase.payments.map { p -> PersonalMeetingGetDTO(p.meeting) }
+        return userFromDatabase.payments
+            .filter { m -> m.date > Date(System.currentTimeMillis()) }
+            .map { p -> PersonalMeetingGetDTO(p.meeting) }
     }
 
     @PostMapping("topics/{topicId}/meetings")
