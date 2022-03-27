@@ -22,17 +22,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @AutoConfigureMockMvc
 @TestPropertySource(locations = ["classpath:application-integrationtest.properties"])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TutortekApplicationTests {
-
-	@Autowired
-	lateinit var topicService: TopicService
-
-	@Autowired
-	lateinit var userService: UserService
-
-	@Autowired
-	lateinit var userProfileService: UserProfileService
-
+class TutortekApplicationTests(
+	@Autowired private val topicService: TopicService,
+	@Autowired private val userService: UserService,
+	@Autowired private val userProfileService: UserProfileService
+) {
+	
 	@BeforeAll
 	fun setUp() {
 		val user = User(email = "junit@test.com", password = "Junit1234")
