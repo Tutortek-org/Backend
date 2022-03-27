@@ -27,6 +27,8 @@ class TopicTests(
 	@Autowired private val userProfileService: UserProfileService
 ) {
 
+	private lateinit var latestTopic: Topic
+
 	@BeforeEach
 	fun setUp() {
 		val user = User(email = "junit@test.com", password = "Junit1234")
@@ -40,7 +42,7 @@ class TopicTests(
 		userService.saveUser(userFromDatabase)
 
 		val topic = Topic(name = "Test name", description = "Test description", userProfile = userProfileService.getFirstUserProfile())
-		topicService.saveTopic(topic)
+		latestTopic = topicService.saveTopic(topic)
 	}
 
 	@AfterEach
@@ -63,15 +65,14 @@ class TopicTests(
 
 	@Test
 	fun topicDelete() {
-		val topic = topicService.getFirstTopic()
-		topic.id?.let { topicService.deleteTopic(it) }
+		latestTopic.id?.let { topicService.deleteTopic(it) }
 		assertThat(topicService.getAllTopics().isEmpty())
 	}
 
 	@Test
 	fun topicGet() {
-		val topic = topicService.getTopic(1)
-		assertThat(topic.get().name).isEqualTo("Test name")
+		val topic = latestTopic.id?.let { topicService.getTopic(it) }
+		assertThat(topic?.get()?.name).isEqualTo("Test name")
 	}
 
 	@Test
