@@ -51,7 +51,45 @@ class TopicTests(
 	}
 
 	@Test
-	fun topicCountTest() {
+	fun topicCount() {
 		assertThat(topicService.getAllTopics().size).isEqualTo(1)
+	}
+
+	@Test
+	fun topicEmpty() {
+		topicService.clearTopics()
+		assertThat(topicService.getAllTopics().isEmpty())
+	}
+
+	@Test
+	fun topicDelete() {
+		val topic = topicService.getFirstTopic()
+		topic.id?.let { topicService.deleteTopic(it) }
+		assertThat(topicService.getAllTopics().isEmpty())
+	}
+
+	@Test
+	fun topicGet() {
+		val topic = topicService.getTopic(1)
+		assertThat(topic.get().name).isEqualTo("Test name")
+	}
+
+	@Test
+	fun topicSave() {
+		val userProfile = userProfileService.getFirstUserProfile()
+		topicService.saveTopic(Topic(userProfile = userProfile))
+		assertThat(topicService.getAllTopics().size).isEqualTo(2)
+	}
+
+	@Test
+	fun topicFirst() {
+		val topic = topicService.getFirstTopic()
+		assertThat(topic.name).isEqualTo("Test name")
+	}
+
+	@Test
+	fun topicUnapproved() {
+		val topics = topicService.getAllUnapproved()
+		assertThat(topics.size).isEqualTo(1)
 	}
 }
