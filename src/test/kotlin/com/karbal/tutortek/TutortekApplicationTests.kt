@@ -45,7 +45,6 @@ class TutortekApplicationTests {
 		userProfileService.saveUserProfile(userProfile)
 		userService.saveUser(userFromDatabase)
 
-
 		val topic = Topic(name = "Test name", description = "Test description", userProfile = userProfileService.getFirstUserProfile())
 		topicService.saveTopic(topic)
 	}
