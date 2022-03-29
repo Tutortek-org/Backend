@@ -6,6 +6,7 @@ import com.karbal.tutortek.entities.RoleEntity
 import com.karbal.tutortek.services.RoleService
 import org.json.JSONObject
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -26,12 +27,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource(locations = ["classpath:application-integrationtest.properties"])
-class StatisticsControllerTests(
+class BugReportControllerTests(
     @Autowired private val mvc: MockMvc,
     @Autowired private val roleService: RoleService
 ) {
 
     private lateinit var latestToken: String
+    private var latestBugReportID: Long = 1
 
     @BeforeAll
     fun setUp() {
@@ -67,12 +69,54 @@ class StatisticsControllerTests(
             }
     }
 
-    @Test
-    fun getStatistics() {
+    @BeforeEach
+    fun setUpEach() {
+        val bugReportBody = JSONObject().apply {
+            put("name", "Test")
+            put("description", "Test")
+        }
+
         mvc.perform(MockMvcRequestBuilders
-            .get("/statistics")
+            .post("/bugreports")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer $latestToken")
+            .content(bugReportBody.toString()))
+            .andExpect {
+                val response = JSONObject(it.response.contentAsString)
+                latestBugReportID = response.getLong("id")
+            }
+    }
+
+    @Test
+    fun createBugReport() {
+        val body = JSONObject().apply {
+            put("name", "Test")
+            put("description", "Test")
+        }
+
+        mvc.perform(MockMvcRequestBuilders
+            .post("/bugreports")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer $latestToken")
+            .content(body.toString()))
+            .andExpect(MockMvcResultMatchers.status().isCreated)
+    }
+
+    @Test
+    fun getAllBugReports() {
+        mvc.perform(MockMvcRequestBuilders
+            .get("/bugreports")
             .contentType(MediaType.APPLICATION_JSON)
             .header("Authorization", "Bearer $latestToken"))
             .andExpect(MockMvcResultMatchers.status().isOk)
+    }
+
+    @Test
+    fun deleteBugReport() {
+        mvc.perform(MockMvcRequestBuilders
+            .delete("/bugreports/$latestBugReportID")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer $latestToken"))
+            .andExpect(MockMvcResultMatchers.status().isNoContent)
     }
 }
