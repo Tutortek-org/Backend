@@ -1,13 +1,8 @@
-package com.karbal.tutortek
+package com.karbal.tutortek.service_tests
 
-import com.karbal.tutortek.entities.Meeting
-import com.karbal.tutortek.entities.Topic
-import com.karbal.tutortek.entities.User
-import com.karbal.tutortek.entities.UserProfile
-import com.karbal.tutortek.services.MeetingService
-import com.karbal.tutortek.services.TopicService
-import com.karbal.tutortek.services.UserProfileService
-import com.karbal.tutortek.services.UserService
+import com.karbal.tutortek.TutortekApplication
+import com.karbal.tutortek.entities.*
+import com.karbal.tutortek.services.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -23,15 +18,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = [TutortekApplication::class])
 @AutoConfigureMockMvc
 @TestPropertySource(locations = ["classpath:application-integrationtest.properties"])
-class MeetingTests(
+class LearningMaterialTests(
     @Autowired private val topicService: TopicService,
     @Autowired private val userService: UserService,
     @Autowired private val userProfileService: UserProfileService,
-    @Autowired private val meetingService: MeetingService
+    @Autowired private val meetingService: MeetingService,
+    @Autowired private val learningMaterialService: LearningMaterialService
 ) {
 
+    private lateinit var latestMaterial: LearningMaterial
     private lateinit var latestMeeting: Meeting
-    private lateinit var latestTopic: Topic
 
     @BeforeEach
     fun setUp() {
@@ -45,10 +41,13 @@ class MeetingTests(
         userService.saveUser(userFromDatabase)
 
         val topic = Topic(name = "Test name", description = "Test description", userProfile = profileFromDatabase)
-        latestTopic = topicService.saveTopic(topic)
+        topicService.saveTopic(topic)
 
         val meeting = Meeting(topic = topic)
         latestMeeting = meetingService.saveMeeting(meeting)
+
+        val learningMaterial = LearningMaterial(meeting = latestMeeting)
+        latestMaterial = learningMaterialService.saveLearningMaterial(learningMaterial)
     }
 
     @AfterEach
@@ -57,41 +56,41 @@ class MeetingTests(
         userProfileService.clearUserProfiles()
         userService.clearUsers()
         meetingService.clearMeetings()
+        learningMaterialService.clearLearningMaterials()
     }
 
     @Test
-    fun meetingCount() {
-        assertThat(meetingService.getAllMeetings().size).isEqualTo(1)
+    fun materialCount() {
+        assertThat(learningMaterialService.getAllLearningMaterials().size).isEqualTo(1)
     }
 
     @Test
-    fun meetingSave() {
-        val meeting = Meeting(topic = latestTopic)
-        meetingService.saveMeeting(meeting)
-        assertThat(meetingService.getAllMeetings().size).isEqualTo(2)
+    fun materialSave() {
+        val learningMaterial = LearningMaterial(meeting = latestMeeting)
+        learningMaterialService.saveLearningMaterial(learningMaterial)
+        assertThat(learningMaterialService.getAllLearningMaterials().size).isEqualTo(2)
     }
 
     @Test
-    fun meetingDelete() {
-        latestMeeting.id?.let { meetingService.deleteMeeting(it) }
-        assertThat(meetingService.getAllMeetings().isEmpty())
+    fun materialDelete() {
+        latestMaterial.id?.let { learningMaterialService.deleteLearningMaterial(it) }
+        assertThat(learningMaterialService.getAllLearningMaterials().isEmpty())
     }
 
     @Test
-    fun meetingGet() {
-        val meeting = latestMeeting.id?.let { meetingService.getMeeting(it) }
-        assertThat(meeting?.get()?.id).isNotNull
+    fun materialGet() {
+        val material = latestMaterial.id?.let { learningMaterialService.getLearningMaterial(it) }
+        assertThat(material?.get()?.id).isNotNull
     }
 
     @Test
-    fun meetingFirst() {
-        val meeting = meetingService.getFirstMeeting()
-        assertThat(meeting.id).isNotNull
+    fun materialClear() {
+        learningMaterialService.clearLearningMaterials()
+        assertThat(learningMaterialService.getAllLearningMaterials().isEmpty())
     }
 
     @Test
-    fun meetingClear() {
-        meetingService.clearMeetings()
-        assertThat(meetingService.getAllMeetings().isEmpty())
+    fun materialUnapproved() {
+        assertThat(learningMaterialService.getAllUnapproved().size).isEqualTo(1)
     }
 }

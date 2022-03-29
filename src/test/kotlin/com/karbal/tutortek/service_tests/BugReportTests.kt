@@ -1,6 +1,9 @@
-package com.karbal.tutortek
+package com.karbal.tutortek.service_tests
 
+import com.karbal.tutortek.TutortekApplication
+import com.karbal.tutortek.entities.BugReport
 import com.karbal.tutortek.entities.User
+import com.karbal.tutortek.services.BugReportService
 import com.karbal.tutortek.services.UserService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -17,67 +20,56 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = [TutortekApplication::class])
 @AutoConfigureMockMvc
 @TestPropertySource(locations = ["classpath:application-integrationtest.properties"])
-class UserTests(
+class BugReportTests(
+    @Autowired private val bugReportService: BugReportService,
     @Autowired private val userService: UserService
 ) {
+
+    private lateinit var latestReport: BugReport
     private lateinit var latestUser: User
 
     @BeforeEach
     fun setUp() {
         val user = User(email = "junit@test.com", password = "Junit1234")
         latestUser = userService.saveUser(user)
+
+        val bugReport = BugReport(user = latestUser)
+        latestReport = bugReportService.saveBugReport(bugReport)
     }
 
     @AfterEach
     fun teardown() {
+        bugReportService.clearBugReports()
         userService.clearUsers()
     }
 
     @Test
-    fun userCount() {
-        assertThat(userService.getAllUsers().size).isEqualTo(1)
+    fun bugReportCount() {
+        assertThat(bugReportService.getAllBugReports().size).isEqualTo(1)
     }
 
     @Test
-    fun userEmpty() {
-        userService.clearUsers()
-        assertThat(userService.getAllUsers().isEmpty())
+    fun bugReportSave() {
+        val bugReport = BugReport(user = latestUser)
+        bugReportService.saveBugReport(bugReport)
+        assertThat(bugReportService.getAllBugReports().size).isEqualTo(2)
     }
 
     @Test
-    fun userSave() {
-        val user = User(email = "junit2@test.com", password = "Junit1234")
-        userService.saveUser(user)
-        assertThat(userService.getAllUsers().size).isEqualTo(2)
+    fun bugReportDelete() {
+        latestReport.id?.let { bugReportService.deleteBugReport(it) }
+        assertThat(bugReportService.getAllBugReports().isEmpty())
     }
 
     @Test
-    fun userGetByEmail() {
-        val user = userService.getUserByEmail("junit@test.com")
-        assertThat(user.id).isNotNull
+    fun bugReportGet() {
+        val report = latestReport.id?.let { bugReportService.getBugReport(it) }
+        assertThat(report?.get()?.id).isNotNull
     }
 
     @Test
-    fun userCountByEmail() {
-        val count = userService.getUserCountByEmail("junit@test.com")
-        assertThat(count).isEqualTo(1)
-    }
-
-    @Test
-    fun userFirst() {
-        val user = userService.getFirstUser()
-        assertThat(user.id).isNotNull
-    }
-
-    @Test
-    fun userGet() {
-        val user = latestUser.id?.let { userService.getUserById(it) }
-        assertThat(user?.get()?.id).isNotNull
-    }
-
-    @Test
-    fun userDelete() {
-        latestUser.id?.let { userService.deleteUserById(it) }
-        assertThat(userService.getAllUsers().isEmpty())
+    fun bugReportClear() {
+        bugReportService.clearBugReports()
+        assertThat(bugReportService.getAllBugReports().isEmpty())
     }
 }

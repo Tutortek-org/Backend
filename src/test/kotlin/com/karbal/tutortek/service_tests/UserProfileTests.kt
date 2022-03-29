@@ -1,5 +1,6 @@
-package com.karbal.tutortek
+package com.karbal.tutortek.service_tests
 
+import com.karbal.tutortek.TutortekApplication
 import com.karbal.tutortek.entities.User
 import com.karbal.tutortek.entities.UserProfile
 import com.karbal.tutortek.services.UserProfileService
