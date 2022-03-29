@@ -1,7 +1,14 @@
-package com.karbal.tutortek
+package com.karbal.tutortek.service_tests
 
-import com.karbal.tutortek.entities.*
-import com.karbal.tutortek.services.*
+import com.karbal.tutortek.TutortekApplication
+import com.karbal.tutortek.entities.Meeting
+import com.karbal.tutortek.entities.Topic
+import com.karbal.tutortek.entities.User
+import com.karbal.tutortek.entities.UserProfile
+import com.karbal.tutortek.services.MeetingService
+import com.karbal.tutortek.services.TopicService
+import com.karbal.tutortek.services.UserProfileService
+import com.karbal.tutortek.services.UserService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -17,37 +24,32 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = [TutortekApplication::class])
 @AutoConfigureMockMvc
 @TestPropertySource(locations = ["classpath:application-integrationtest.properties"])
-class PaymentTests(
+class MeetingTests(
     @Autowired private val topicService: TopicService,
     @Autowired private val userService: UserService,
     @Autowired private val userProfileService: UserProfileService,
-    @Autowired private val meetingService: MeetingService,
-    @Autowired private val paymentService: PaymentService
+    @Autowired private val meetingService: MeetingService
 ) {
 
-    private lateinit var latestPayment: Payment
     private lateinit var latestMeeting: Meeting
-    private lateinit var latestUser: User
+    private lateinit var latestTopic: Topic
 
     @BeforeEach
     fun setUp() {
         val user = User(email = "junit@test.com", password = "Junit1234")
-        latestUser = userService.saveUser(user)
+        val userFromDatabase = userService.saveUser(user)
 
         val userProfile = UserProfile(firstName = "Junit", lastName = "Tester")
-        userProfile.user = latestUser
+        userProfile.user = userFromDatabase
         user.userProfile = userProfile
         val profileFromDatabase = userProfileService.saveUserProfile(userProfile)
-        userService.saveUser(latestUser)
+        userService.saveUser(userFromDatabase)
 
         val topic = Topic(name = "Test name", description = "Test description", userProfile = profileFromDatabase)
-        topicService.saveTopic(topic)
+        latestTopic = topicService.saveTopic(topic)
 
         val meeting = Meeting(topic = topic)
         latestMeeting = meetingService.saveMeeting(meeting)
-
-        val payment = Payment(user = latestUser, meeting = latestMeeting)
-        latestPayment = paymentService.savePayment(payment)
     }
 
     @AfterEach
@@ -56,36 +58,41 @@ class PaymentTests(
         userProfileService.clearUserProfiles()
         userService.clearUsers()
         meetingService.clearMeetings()
-        paymentService.clearPayments()
     }
 
     @Test
-    fun paymentCount() {
-        assertThat(paymentService.getAllPayments().size).isEqualTo(1)
+    fun meetingCount() {
+        assertThat(meetingService.getAllMeetings().size).isEqualTo(1)
     }
 
     @Test
-    fun paymentSave() {
-        val payment = Payment(user = latestUser, meeting = latestMeeting)
-        paymentService.savePayment(payment)
-        assertThat(paymentService.getAllPayments().size).isEqualTo(2)
+    fun meetingSave() {
+        val meeting = Meeting(topic = latestTopic)
+        meetingService.saveMeeting(meeting)
+        assertThat(meetingService.getAllMeetings().size).isEqualTo(2)
     }
 
     @Test
-    fun paymentDelete() {
-        latestPayment.id?.let { paymentService.deletePayment(it) }
-        assertThat(paymentService.getAllPayments().isEmpty())
+    fun meetingDelete() {
+        latestMeeting.id?.let { meetingService.deleteMeeting(it) }
+        assertThat(meetingService.getAllMeetings().isEmpty())
     }
 
     @Test
-    fun paymentGet() {
-        val payment = latestPayment.id?.let { paymentService.getPayment(it) }
-        assertThat(payment?.get()?.id).isNotNull
+    fun meetingGet() {
+        val meeting = latestMeeting.id?.let { meetingService.getMeeting(it) }
+        assertThat(meeting?.get()?.id).isNotNull
     }
 
     @Test
-    fun paymentClear() {
-        paymentService.clearPayments()
-        assertThat(paymentService.getAllPayments().isEmpty())
+    fun meetingFirst() {
+        val meeting = meetingService.getFirstMeeting()
+        assertThat(meeting.id).isNotNull
+    }
+
+    @Test
+    fun meetingClear() {
+        meetingService.clearMeetings()
+        assertThat(meetingService.getAllMeetings().isEmpty())
     }
 }

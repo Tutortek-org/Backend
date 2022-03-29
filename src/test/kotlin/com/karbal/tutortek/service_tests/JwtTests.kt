@@ -1,5 +1,6 @@
-package com.karbal.tutortek
+package com.karbal.tutortek.service_tests
 
+import com.karbal.tutortek.TutortekApplication
 import com.karbal.tutortek.dto.userDTO.UserPostDTO
 import com.karbal.tutortek.dto.userDTO.UserPutDTO
 import com.karbal.tutortek.entities.RoleEntity

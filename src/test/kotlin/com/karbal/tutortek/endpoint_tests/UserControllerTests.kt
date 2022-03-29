@@ -1,5 +1,6 @@
-package com.karbal.tutortek
+package com.karbal.tutortek.endpoint_tests
 
+import com.karbal.tutortek.TutortekApplication
 import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.entities.RoleEntity
 import com.karbal.tutortek.services.RoleService
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = [TutortekApplication::class])
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource(locations = ["classpath:application-integrationtest.properties"])
 class UserControllerTests(
     @Autowired private val mvc: MockMvc,
