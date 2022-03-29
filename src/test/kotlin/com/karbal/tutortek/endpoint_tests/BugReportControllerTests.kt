@@ -18,6 +18,7 @@ import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
@@ -71,17 +72,7 @@ class BugReportControllerTests(
 
     @BeforeEach
     fun setUpEach() {
-        val bugReportBody = JSONObject().apply {
-            put("name", "Test")
-            put("description", "Test")
-        }
-
-        mvc.perform(MockMvcRequestBuilders
-            .post("/bugreports")
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", "Bearer $latestToken")
-            .content(bugReportBody.toString()))
-            .andExpect {
+        prepareRequest().andExpect {
                 val response = JSONObject(it.response.contentAsString)
                 latestBugReportID = response.getLong("id")
             }
@@ -89,17 +80,7 @@ class BugReportControllerTests(
 
     @Test
     fun createBugReport() {
-        val body = JSONObject().apply {
-            put("name", "Test")
-            put("description", "Test")
-        }
-
-        mvc.perform(MockMvcRequestBuilders
-            .post("/bugreports")
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", "Bearer $latestToken")
-            .content(body.toString()))
-            .andExpect(MockMvcResultMatchers.status().isCreated)
+        prepareRequest().andExpect(MockMvcResultMatchers.status().isCreated)
     }
 
     @Test
@@ -118,5 +99,18 @@ class BugReportControllerTests(
             .contentType(MediaType.APPLICATION_JSON)
             .header("Authorization", "Bearer $latestToken"))
             .andExpect(MockMvcResultMatchers.status().isNoContent)
+    }
+
+    private fun prepareRequest(): ResultActions {
+        val body = JSONObject().apply {
+            put("name", "Test")
+            put("description", "Test")
+        }
+
+        return mvc.perform(MockMvcRequestBuilders
+            .post("/bugreports")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer $latestToken")
+            .content(body.toString()))
     }
 }
