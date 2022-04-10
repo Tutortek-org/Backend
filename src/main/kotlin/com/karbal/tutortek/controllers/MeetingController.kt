@@ -8,6 +8,7 @@ import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.dto.meetingDTO.PersonalMeetingGetDTO
+import com.karbal.tutortek.dto.userProfileDTO.UserProfileGetDTO
 import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
@@ -77,6 +78,24 @@ class MeetingController(
         return userFromDatabase.payments
             .filter { p -> p.meeting.date >= Date(System.currentTimeMillis()) }
             .map { p -> PersonalMeetingGetDTO(p.meeting) }
+    }
+
+    @GetMapping("meetings/{id}/registered")
+    @Secured(Role.ADMIN_ANNOTATION, Role.TUTOR_ANNOTATION)
+    fun getRegisteredUsers(@PathVariable id: Long, request: HttpServletRequest): List<UserProfileGetDTO?> {
+        val meeting = meetingService.getMeeting(id)
+        if(meeting.isEmpty)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.MEETING_NOT_FOUND)
+
+        val meetingFromDatabase = meeting.get()
+        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
+
+        val profileId = claims?.get("pid").toString().toLong()
+        if(meetingFromDatabase.topic.userProfile.id != profileId)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.USER_FORBIDDEN_FROM_ALTERING)
+
+        return meetingFromDatabase.payments.map { p -> p.user.userProfile?.let { UserProfileGetDTO(it) } }
     }
 
     @PostMapping("topics/{topicId}/meetings")
