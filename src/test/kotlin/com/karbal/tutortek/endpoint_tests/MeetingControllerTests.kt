@@ -178,6 +178,15 @@ class MeetingControllerTests(
             .andExpect(MockMvcResultMatchers.status().isOk)
     }
 
+    @Test
+    fun getRegisteredUsers() {
+        mvc.perform(MockMvcRequestBuilders
+            .get("/meetings/$latestMeetingID/registered")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer $latestToken"))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+    }
+
     private fun prepareRequest(): ResultActions {
         val body = JSONObject().apply {
             put("name", "Test")
