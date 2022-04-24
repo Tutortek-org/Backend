@@ -6,11 +6,13 @@ import com.karbal.tutortek.dto.userProfileDTO.UserProfilePostDTO
 import com.karbal.tutortek.entities.UserProfile
 import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.constants.SecurityConstants
 import com.karbal.tutortek.dto.ratingDTO.RatingPatchDTO
 import com.karbal.tutortek.dto.userProfileDTO.UserProfilePutDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.services.UserService
 import com.karbal.tutortek.utils.S3Utils
+import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -94,7 +96,17 @@ class UserProfileController(
     }
 
     @PatchMapping("{id}")
-    fun addRating(@PathVariable id: Long, @RequestBody ratingPatchDTO: RatingPatchDTO): UserProfileGetDTO {
+    fun addRating(
+        @PathVariable id: Long,
+        @RequestBody ratingPatchDTO: RatingPatchDTO,
+        request: HttpServletRequest): UserProfileGetDTO {
+
+        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val profileId = claims?.get("pid").toString().toLong()
+        if(profileId == id)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ApiErrorSlug.SELF_RATE)
+
         val userProfile = userProfileService.getUserProfile(id)
         if(userProfile.isEmpty)
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ApiErrorSlug.USER_NOT_FOUND)

@@ -12,6 +12,7 @@ object ApiErrorSlug {
     const val USER_REPORT_NOT_FOUND = "User report not found"
     const val USER_FORBIDDEN_FROM_ALTERING = "User is forbidden from altering this resource"
     const val USER_ALREADY_SIGNED_UP = "User is already signed up for this meeting"
+    const val SELF_RATE = "You cannot rate yourself"
 
     // UserProfile DTO validation errors
     const val FIRST_NAME_EMPTY = "First name field is empty"
