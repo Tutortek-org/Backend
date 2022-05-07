@@ -12,6 +12,8 @@ import com.karbal.tutortek.security.Role
 import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import javax.annotation.security.RolesAllowed
@@ -110,7 +112,9 @@ class TopicController(
     private fun verifyUserProfileID(topic: Topic, request: HttpServletRequest) {
         val claims = jwtTokenUtil.parseClaimsFromRequest(request)
         val profileId = claims?.get("pid").toString().toLong()
-        if(topic.userProfile.id != profileId)
+        val authorities = SecurityContextHolder.getContext().authentication.authorities
+
+        if(topic.userProfile.id != profileId && !authorities.contains(SimpleGrantedAuthority(Role.ADMIN_ANNOTATION)))
             throw ResponseStatusException(HttpStatus.FORBIDDEN, ApiErrorSlug.USER_FORBIDDEN_FROM_ALTERING)
     }
 
