@@ -109,11 +109,14 @@ class TopicController(
         val extractedTopic = topicInDatabase.get()
         extractedTopic.isApproved = true
 
-        val notificationPostDTO = NotificationPostDTO(
-            "Topic approval",
-            "Your topic \"${extractedTopic.name}\" has been approved"
-        )
-        SNSUtils.sendNotificationToSingleDevice(extractedTopic.userProfile.deviceEndpointArn, notificationPostDTO)
+        try {
+            val notificationPostDTO = NotificationPostDTO(
+                "Topic approval",
+                "Your topic \"${extractedTopic.name}\" has been approved"
+            )
+            SNSUtils.sendNotificationToSingleDevice(extractedTopic.userProfile.deviceEndpointArn, notificationPostDTO)
+        }
+        catch (_: Exception){}
 
         return TopicGetDTO(topicService.saveTopic(extractedTopic))
     }

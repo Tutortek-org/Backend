@@ -140,11 +140,14 @@ class LearningMaterialController(
         val extractedMaterial = material.get()
         extractedMaterial.isApproved = true
 
-        val notificationPostDTO = NotificationPostDTO(
-            "Learning material approval",
-            "Your learning material \"${extractedMaterial.name}\" has been approved"
-        )
-        SNSUtils.sendNotificationToSingleDevice(extractedMaterial.meeting.topic.userProfile.deviceEndpointArn, notificationPostDTO)
+        try {
+            val notificationPostDTO = NotificationPostDTO(
+                "Learning material approval",
+                "Your learning material \"${extractedMaterial.name}\" has been approved"
+            )
+            SNSUtils.sendNotificationToSingleDevice(extractedMaterial.meeting.topic.userProfile.deviceEndpointArn, notificationPostDTO)
+        }
+        catch (_: Exception){}
 
         return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(extractedMaterial))
     }
