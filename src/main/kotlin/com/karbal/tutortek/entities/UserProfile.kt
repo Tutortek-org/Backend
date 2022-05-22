@@ -29,6 +29,9 @@ data class UserProfile(
     @Column(name = "description", nullable = false)
     var description: String = "",
 
+    @Column(name = "deviceEndpointArn", nullable = false)
+    var deviceEndpointArn: String = "",
+
     @Column(name = "ratingAmount", nullable = false)
     var ratingAmount: Long = 0,
 

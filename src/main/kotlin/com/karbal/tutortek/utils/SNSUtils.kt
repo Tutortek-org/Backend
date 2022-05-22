@@ -38,6 +38,15 @@ class SNSUtils {
             processEndpoints(notificationPostDTO, client)
         }
 
+        fun sendNotificationToSingleDevice(deviceArn: String, notificationPostDTO: NotificationPostDTO) {
+            val client = getSNSClient()
+            val request = PublishRequest()
+                .withTargetArn(deviceArn)
+                .withSubject(notificationPostDTO.title)
+                .withMessage(notificationPostDTO.toString())
+            client?.publish(request)
+        }
+
         fun createEndpoint(token: String): String? {
             val client = getSNSClient()
             var result = createEndpointInner(token, client)

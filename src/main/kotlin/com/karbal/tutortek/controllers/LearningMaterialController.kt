@@ -6,9 +6,11 @@ import com.karbal.tutortek.entities.LearningMaterial
 import com.karbal.tutortek.services.LearningMaterialService
 import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.constants.ApiErrorSlug
+import com.karbal.tutortek.dto.notificationDTO.NotificationPostDTO
 import com.karbal.tutortek.entities.Topic
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
+import com.karbal.tutortek.utils.SNSUtils
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.*
@@ -137,6 +139,13 @@ class LearningMaterialController(
 
         val extractedMaterial = material.get()
         extractedMaterial.isApproved = true
+
+        val notificationPostDTO = NotificationPostDTO(
+            "Learning material approval",
+            "Your learning material \"${extractedMaterial.name}\" has been approved"
+        )
+        SNSUtils.sendNotificationToSingleDevice(extractedMaterial.meeting.topic.userProfile.deviceEndpointArn, notificationPostDTO)
+
         return LearningMaterialGetDTO(learningMaterialService.saveLearningMaterial(extractedMaterial))
     }
 

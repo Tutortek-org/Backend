@@ -7,8 +7,10 @@ import com.karbal.tutortek.services.TopicService
 import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.constants.ApiErrorSlug
 import com.karbal.tutortek.constants.SecurityConstants
+import com.karbal.tutortek.dto.notificationDTO.NotificationPostDTO
 import com.karbal.tutortek.security.JwtTokenUtil
 import com.karbal.tutortek.security.Role
+import com.karbal.tutortek.utils.SNSUtils
 import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
@@ -106,6 +108,13 @@ class TopicController(
 
         val extractedTopic = topicInDatabase.get()
         extractedTopic.isApproved = true
+
+        val notificationPostDTO = NotificationPostDTO(
+            "Topic approval",
+            "Your topic \"${extractedTopic.name}\" has been approved"
+        )
+        SNSUtils.sendNotificationToSingleDevice(extractedTopic.userProfile.deviceEndpointArn, notificationPostDTO)
+
         return TopicGetDTO(topicService.saveTopic(extractedTopic))
     }
 
