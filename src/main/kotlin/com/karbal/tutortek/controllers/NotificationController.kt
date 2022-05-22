@@ -11,6 +11,7 @@ import com.karbal.tutortek.services.UserProfileService
 import com.karbal.tutortek.utils.SNSUtils
 import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -52,6 +53,21 @@ class NotificationController(
     fun sendNotification(@RequestBody notificationPostDTO: NotificationPostDTO) {
         verifyNotificationPostDto(notificationPostDTO)
         SNSUtils.sendNotifications(notificationPostDTO)
+    }
+
+    @DeleteMapping("cleararn")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun clearArn(request: HttpServletRequest) {
+        var claims = request.getAttribute(SecurityConstants.CLAIMS_ATTRIBUTE) as DefaultClaims?
+        if(claims == null) claims = jwtTokenUtil.parseClaimsFromRequest(request)
+        val profileId = claims?.get("pid").toString().toLong()
+        val profile = userProfileService.getUserProfile(profileId)
+
+        if(!profile.isEmpty) {
+            val profileFromDatabase = profile.get()
+            profileFromDatabase.deviceEndpointArn = ""
+            userProfileService.saveUserProfile(profileFromDatabase)
+        }
     }
 
     private fun verifyEndpointDto(endpointPostDTO: EndpointPostDTO) {
